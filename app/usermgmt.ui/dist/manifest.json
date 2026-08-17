@@ -99,7 +99,7 @@
 					"earlyRequests": true
 				}
 			},
-			"mdmCommon": {
+			"commonServiceModel": {
 				"dataSource": "mdmCommonService",
 				"preload": true,
 				"settings": {

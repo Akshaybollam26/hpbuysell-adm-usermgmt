@@ -8,9 +8,9 @@ sap.ui.define([
             Handler._oMultiInput = oEvent.getSource();
             const oModel = Handler._oMultiInput.getModel(),
                 sTitle = "Select Suppliers",
-                sPath = "/SupplierMaster",
-                sKey = "supplierId",
-                sText = "supplierName";
+                sPath = "commonServiceModel>/SupplierVH",
+                sKey = "commonServiceModel>supplierid",
+                sText = "commonServiceModel>suppliername";
             sap.ui.require(["sap/ui/comp/valuehelpdialog/ValueHelpDialog"], function (ValueHelpDialog) {
                 const oDialog = new ValueHelpDialog({
                     title: sTitle,

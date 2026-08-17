@@ -9,7 +9,7 @@
                             <Input id="fb1"/>
                         </fb:control>
                     </fb:FilterGroupItem>
-                    <fb:FilterGroupItem groupName="__$INTERNAL$" name="projectName" label="Project Name" visibleInFilterBar="true">
+                    <fb:FilterGroupItem groupName="__$INTERNAL$" name="companyCode" label="Company Code" visibleInFilterBar="true">
                         <fb:control>
                             <Input id="fb2"/>
                         </fb:control>

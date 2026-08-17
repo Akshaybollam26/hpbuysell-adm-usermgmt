@@ -191,18 +191,26 @@ sap.ui.define([
                             header: new sap.m.Text({
                                 text: "Project Name"
                             })
+                        }),
+                        new sap.m.Column({
+                            header: new sap.m.Text({
+                                text: "Company Code"
+                            })
                         })
                     ]
                 });
                 oTable.bindItems({
-                    path: "/ProjectMaster",
+                    path: "commonServiceModel>/ProjectUAMVH",
                     template: new sap.m.ColumnListItem({
                         cells: [
                             new sap.m.Text({
-                                text: "{projectId}"
+                                text: "{commonServiceModel>wbselement}"
                             }),
                             new sap.m.Text({
-                                text: "{projectName}"
+                                text: "{commonServiceModel>wbsdescription}"
+                            }),
+                            new sap.m.Text({
+                                text: "{commonServiceModel>companycode}"
                             })
                         ]
                     })
@@ -215,19 +223,19 @@ sap.ui.define([
         onVHDForProjectFilter_Search: function(oEvent){
             var oFilterBar = oEvent.getSource();
             var aFilterbarItems = oFilterBar.getFilterGroupItems();
-            var sProjectId, sProjectName, aFilters = [];
+            var sProjectId, sCompanyCode, aFilters = [];
             aFilterbarItems.forEach(function (oItem) {
                 var sName = oItem.getName();
                 var sValue = oItem.getControl().getValue().trim();
  
                 if (sName === "projectId") {
                     sProjectId = sValue;
-                } else if (sName === "projectName") {
-                    sProjectName = sValue;
+                } else if (sName === "companyCode") {
+                    sCompanyCode = sValue;
                 }
             });
-            sProjectId &&  aFilters.push(new sap.ui.model.Filter("projectId", sap.ui.model.FilterOperator.Contains, sProjectId));
-            sProjectName &&  aFilters.push(new sap.ui.model.Filter("projectName", sap.ui.model.FilterOperator.Contains, sProjectName));
+            sProjectId &&  aFilters.push(new sap.ui.model.Filter("wbselement", sap.ui.model.FilterOperator.Contains, sProjectId));
+            sCompanyCode &&  aFilters.push(new sap.ui.model.Filter("companycode", sap.ui.model.FilterOperator.Contains, sCompanyCode));
             var oTable = this.vhdForProjectsFilter.getTable();
             if(!oTable)
                 return

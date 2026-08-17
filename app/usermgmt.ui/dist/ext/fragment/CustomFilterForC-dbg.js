@@ -9,9 +9,9 @@ sap.ui.define([
             const oModel = Handler._oMultiInput.getModel(),
                 bSupplier = Handler._oMultiInput.getId().indexOf("Supplier") >= 0,
                 sTitle = bSupplier ? "Select Suppliers" : "Select Customers",
-                sPath = bSupplier ? "/SupplierMaster" : "/CustomerMaster",
-                sKey = bSupplier ? "supplierId" : "customerId",
-                sText = bSupplier ? "supplierName" : "customerName";
+                sPath = bSupplier ? "commonServiceModel>/SupplierVH" : "commonServiceModel>/CustomerVH",
+                sKey = bSupplier ? "commonServiceModel>supplierid" : "commonServiceModel>customerid",
+                sText = bSupplier ? "commonServiceModel>suppliername" : "commonServiceModel>customername";
             debugger;
             sap.ui.require(["sap/ui/comp/valuehelpdialog/ValueHelpDialog"], function (ValueHelpDialog) {
                 const oDialog = new ValueHelpDialog({

@@ -4,7 +4,7 @@ _out/
 gen/
 test/
 resources/
-app/usermgmtui/dist
+app/usermgmt.ui/dist
 
 .cdsrc-private.json
 default-*.json
