@@ -1,0 +1,16 @@
+<core:FragmentDefinition xmlns:core="sap.ui.core" xmlns="sap.m">
+    <MultiInput
+        id="SupplierFilterMultiInput"
+        width="100%"
+        showValueHelp="true"
+        core:require="{handler:'hpbuysell/adm/usermgmt/ui/ext/fragment/CustomFilterForS'}"
+        valueHelpRequest="handler.onValueHelpRequest"
+        tokenUpdate="handler.onTokenUpdate"
+        value="{
+            path: 'filterValues>',
+            type: 'sap.fe.macros.filter.type.Value',
+            formatOptions: {
+                operator: 'hpbuysell.adm.usermgmt.ui.ext.fragment.CustomFilterForS.filterItems'
+            }
+        }"/>
+</core:FragmentDefinition>

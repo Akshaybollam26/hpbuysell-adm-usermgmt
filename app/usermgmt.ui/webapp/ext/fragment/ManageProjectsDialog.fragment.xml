@@ -1,0 +1,56 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    <Dialog
+        id="manageProjectsDialog"
+        title="Manage Projects"
+        contentWidth="55%" contentHeight="60%">
+        <content>
+            <Toolbar>
+                <SearchField
+                    width="100%"
+                    liveChange="handler.onSearchProjects"
+                    core:require="{ handler: 'hpbuysell/adm/usermgmt/ui/ext/fragment/SuppMngProjColumn'}"/>
+
+                <ToolbarSpacer/>
+
+                <Button
+                    text="Select All"
+                    press="handler.onSelectAll"
+                    core:require="{ handler: 'hpbuysell/adm/usermgmt/ui/ext/fragment/SuppMngProjColumn'}"/>
+
+                <Button
+                    text="Clear All"
+                    visible="{ui>/showClearButton}"
+                    press="handler.onClearAll"
+                    core:require="{ handler: 'hpbuysell/adm/usermgmt/ui/ext/fragment/SuppMngProjColumn'}"/>
+            </Toolbar>
+            <Table id="projectsTable" items="{projects>/}" mode="MultiSelect" width="100%" includeItemInSelection="true">
+                <columns>
+                    <Column>
+                        <Text text="Project ID"/>
+                    </Column>
+                    <Column>
+                        <Text text="Project Name"/>
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem type="Active" selected="{projects>selected}">
+                        <cells>
+                            <Text text="{projects>projectId}"/>
+                            <Text text="{projects>projectName}"/>
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+        <beginButton>
+            <!-- <Button text="Add 2" press=".onAddCustomer"/> -->
+            <Button text="OK" core:require="{ handler: 'hpbuysell/adm/usermgmt/ui/ext/fragment/SuppMngProjColumn'}" press="handler.onOkProjects" />
+        </beginButton>
+        <endButton>
+            <!-- <Button text="Cancel" press=".onCloseDialog"/> -->
+            <Button text="Cancel" core:require="{ handler: 'hpbuysell/adm/usermgmt/ui/ext/fragment/SuppMngProjColumn'}" press="handler.onCancelDialog" />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

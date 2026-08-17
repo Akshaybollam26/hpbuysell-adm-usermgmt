@@ -1,0 +1,7 @@
+<core:FragmentDefinition xmlns:core="sap.ui.core" xmlns="sap.m">
+	<Tokenizer id="Button2" editable="false" tokens="{path: 'projects'}" >
+		<tokens>
+                <Token text="{= ${projectName} + ' (' + ${projectId} + ')' }" />
+        </tokens>
+	</Tokenizer>
+</core:FragmentDefinition>

@@ -1,15 +1,15 @@
 _schema-version: 3.3.0
-ID: BTP-hpbuysell-adm-usermgmt
+ID: hpbuysell-adm-usermgmt
 description: A simple CAP project.
 version: 1.0.0
 modules:
-  - name: BTP-hpbuysell-adm-usermgmt-srv
+  - name: hpbuysell-adm-usermgmt-srv
     type: nodejs
     path: gen/srv
     requires:
-      - name: uaa_BTP-hpbuysell-adm-usermgmt
-      - name: BTP-hpbuysell-adm-usermgmt-destination-service
-      - name: BTP-hpbuysell-adm-usermgmt-connectivity
+      - name: uaa_hpbuysell-adm-usermgmt
+      - name: hpbuysell-adm-usermgmt-destination-service
+      - name: hpbuysell-adm-usermgmt-connectivity
       - name: ust-portfolio-db
     provides:
       - name: srv-api
@@ -20,68 +20,74 @@ modules:
       instances: 1
     build-parameters:
       builder: npm-ci
-  - name: BTP-hpbuysell-adm-usermgmt-destination-content
+  - name: hpbuysell-adm-usermgmt-destination-content
     type: com.sap.application.content
     requires:
-      - name: BTP-hpbuysell-adm-usermgmt-destination-service
+      - name: hpbuysell-adm-usermgmt-destination-service
         parameters:
           content-target: true
-      - name: BTP-hpbuysell-adm-usermgmt_html_repo_host
+      - name: hpbuysell-adm-usermgmt_html_repo_host
         parameters:
           service-key:
-            name: BTP-hpbuysell-adm-usermgmt_html_repo_host-key
-      - name: uaa_BTP-hpbuysell-adm-usermgmt
+            name: hpbuysell-adm-usermgmt_html_repo_host-key
+      - name: uaa_hpbuysell-adm-usermgmt
         parameters:
           service-key:
-            name: uaa_BTP-hpbuysell-adm-usermgmt-key
+            name: uaa_hpbuysell-adm-usermgmt-key
       - name: srv-api
     parameters:
       content:
         instance:
           destinations:
             - Authentication: OAuth2UserTokenExchange
-              Name: hpbuysell-mdm-UserMgmt-srv-dest
-              TokenServiceInstanceName: BTP-hpbuysell-adm-usermgmt-xsuaa-service
-              TokenServiceKeyName: uaa_BTP-hpbuysell-adm-usermgmt-key
+              Name: hpbuysell-adm-usermgmt-srv-dest
+              TokenServiceInstanceName: hpbuysell-adm-usermgmt-xsuaa-service
+              TokenServiceKeyName: uaa_hpbuysell-adm-usermgmt-key
               URL: ~{srv-api/srv-url}
               sap.cloud.service: hpbuysell-adm-usermgmt-service
-            - Name: hpbuysell-mdm-common-srv-dest1
+            - Authentication: OAuth2UserTokenExchange
+              Name: hpbuysell-adm-usermgmt-srv-dest
+              TokenServiceInstanceName: hpbuysell-adm-usermgmt-xsuaa-service
+              TokenServiceKeyName: uaa_hpbuysell-adm-usermgmt-key
+              URL: ~{srv-api/srv-url}
+              sap.cloud.service: hpbuysell-adm-usermgmt-service
+            - Name: hpbuysell-adm-common-srv-dest1
               Description: HP Buy-Sell MDM Common OData V4 Service
               URL: https://org-build-build-ai-subaccount-code-migration-space-btp-14b7b11c.cfapps.us10-001.hana.ondemand.com
               Authentication: OAuth2UserTokenExchange
-              TokenServiceInstanceName: BTP-hpbuysell-adm-usermgmt-xsuaa-service
-              TokenServiceKeyName: uaa_BTP-hpbuysell-adm-usermgmt-key
+              TokenServiceInstanceName: hpbuysell-adm-usermgmt-xsuaa-service
+              TokenServiceKeyName: hpbuysell-adm-usermgmt-key
               HTML5.DynamicDestination: true
               HTML5.ForwardAuthToken: false
               sap.cloud.service: hpbuysell-adm-usermgmt-service
-            - Name: approuter_BTP_hpbuysell_mdm_UserMgmt_html_repo_host
-              ServiceInstanceName: BTP-hpbuysell-adm-usermgmt-html5-app-host-service
-              ServiceKeyName: BTP-hpbuysell-adm-usermgmt_html_repo_host-key
+            - Name: approuter_hpbuysell_adm_UserMgmt_html_repo_host
+              ServiceInstanceName: hpbuysell-adm-usermgmt-html5-app-host-service
+              ServiceKeyName: hpbuysell-adm-usermgmt_html_repo_host-key
               sap.cloud.service: hpbuysell-adm-usermgmt-service
             - Authentication: OAuth2UserTokenExchange
-              Name: approuter_uaa_BTP_hpbuysell_mdm_UserMgmt
-              ServiceInstanceName: BTP-hpbuysell-adm-usermgmt-xsuaa-service
-              ServiceKeyName: uaa_BTP-hpbuysell-adm-usermgmt-key
+              Name: approuter_uaa_hpbuysell_adm_usermgmt
+              ServiceInstanceName: hpbuysell-adm-usermgmt-xsuaa-service
+              ServiceKeyName: hpbuysell-adm-usermgmt-key
           existing_destinations_policy: update
     build-parameters:
       no-source: true
-  - name: BTP-hpbuysell-adm-usermgmt-app-content
+  - name: hpbuysell-adm-usermgmt-app-content
     type: com.sap.application.content
     path: .
     requires:
-      - name: BTP-hpbuysell-adm-usermgmt_html_repo_host
+      - name: hpbuysell-adm-usermgmt_html_repo_host
         parameters:
           content-target: true
     build-parameters:
       build-result: resources
       requires:
         - artifacts:
-            - hpbuysellmdmusermgmtui.zip
-          name: hpbuysellmdmusermgmtui
+            - hpbuyselladmusermgmtui.zip
+          name: hpbuyselladmusermgmtui
           target-path: resources/
-  - name: hpbuysellmdmusermgmtui
+  - name: hpbuyselladmusermgmtui
     type: html5
-    path: app/usermgmtui
+    path: app/usermgmt.ui
     build-parameters:
       build-result: dist
       builder: custom
@@ -91,7 +97,7 @@ modules:
       supported-platforms:
         []
 
-  - name: BTP-hpbuysell-adm-usermgmt-postgres-deployer
+  - name: hpbuysell-adm-usermgmt-postgres-deployer
     type: nodejs
     path: gen/pg
     parameters:
@@ -104,7 +110,7 @@ modules:
     requires:
       - name: ust-portfolio-db
 resources:
-  - name: BTP-hpbuysell-adm-usermgmt-destination-service
+  - name: hpbuysell-adm-usermgmt-destination-service
     type: org.cloudfoundry.managed-service
     parameters:
       config:
@@ -127,31 +133,31 @@ resources:
             existing_destinations_policy: update
         version: 1.0.0
       service: destination
-      service-name: BTP-hpbuysell-adm-usermgmt-destination-service
+      service-name: hpbuysell-adm-usermgmt-destination-service
       service-plan: lite
     requires:
       - name: srv-api
-  - name: BTP-hpbuysell-adm-usermgmt_html_repo_host
+  - name: hpbuysell-adm-usermgmt_html_repo_host
     type: org.cloudfoundry.managed-service
     parameters:
       service: html5-apps-repo
-      service-name: BTP-hpbuysell-adm-usermgmt-html5-app-host-service
+      service-name: hpbuysell-adm-usermgmt-html5-app-host-service
       service-plan: app-host
-  - name: uaa_BTP-hpbuysell-adm-usermgmt
+  - name: uaa_hpbuysell-adm-usermgmt
     type: org.cloudfoundry.managed-service
     parameters:
       path: ./xs-security.json
       service: xsuaa
-      service-name: BTP-hpbuysell-adm-usermgmt-xsuaa-service
+      service-name: hpbuysell-adm-usermgmt-xsuaa-service
       service-plan: application
       config:
-        xsappname: BTP-hpbuysell-adm-usermgmt-${org}-${space}
+        xsappname: hpbuysell-adm-usermgmt-${org}-${space}
         tenant-mode: dedicated
         oauth2-configuration:
           credential-types:
             - "binding-secret"
             - "x509"
-  - name: BTP-hpbuysell-adm-usermgmt-connectivity
+  - name: hpbuysell-adm-usermgmt-connectivity
     type: org.cloudfoundry.managed-service
     parameters:
       service: connectivity

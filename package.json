@@ -1,5 +1,5 @@
 {
-  "name": "BTP-hpbuysell_mdm_UserMgmt",
+  "name": "hpbuysell_adm_usermgmt",
   "version": "1.0.0",
   "dependencies": {
     "@cap-js/change-tracking": "^2.1.0",
@@ -20,8 +20,8 @@
   },
   "scripts": {
     "start": "cds-serve",
-    "watch-usermgmtui": "cds watch --open hpbuysell.mdm.usermgmtui/index.html?sap-ui-xx-viewCache=false --livereload false",
-    "undeploy": "cf undeploy BTP-hpbuysell_mdm_UserMgmt --delete-services --delete-service-keys --delete-service-brokers",
+    "watch-usermgmt.ui": "cds watch --open hpbuysell.adm.usermgmt.ui/index.html?sap-ui-xx-viewCache=false --livereload false",
+    "undeploy": "cf undeploy hpbuysell_adm_usermgmt --delete-services --delete-service-keys --delete-service-brokers",
     "build": "rimraf resources mta_archives && mbt build --mtar archive",
     "deploy": "cf deploy mta_archives/archive.mtar --retries 1"
   },
@@ -30,7 +30,7 @@
     "app/*"
   ],
   "sapux": [
-    "app/usermgmtui"
+    "app/usermgmt.ui"
   ],
   "cds": {
     "requires": {

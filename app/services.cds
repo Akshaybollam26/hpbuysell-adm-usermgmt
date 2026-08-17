@@ -1,2 +1,2 @@
 
-using from './usermgmtui/annotations';
+using from './usermgmt.ui/annotations';

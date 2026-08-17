@@ -1,3 +1,0 @@
-<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
-	<Link id="Button" visible="{= ${ui>/editMode} === 'Editable'}" core:require="{ handler: 'hpbuysell/mdm/usermgmtui/ext/fragment/SuppMngProjColumn'}" text="Manage Projects" press="handler.onPress" />
-</core:FragmentDefinition>

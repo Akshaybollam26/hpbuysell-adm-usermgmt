@@ -1,0 +1,283 @@
+{
+  "_version": "1.86.0",
+  "sap.app": {
+    "id": "hpbuysell.adm.usermgmt.ui",
+    "type": "application",
+    "i18n": "i18n/i18n.properties",
+    "applicationVersion": {
+      "version": "0.0.1"
+    },
+    "title": "{{appTitle}}",
+    "description": "{{appDescription}}",
+    "sourceTemplate": {
+      "id": "@sap/generator-fiori:lrop",
+      "version": "1.28.0",
+      "toolsId": "4ce30084-60df-4562-a423-cae0fddb01f4"
+    },
+    "dataSources": {
+      "mainService": {
+        "uri": "/user-management/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "odataVersion": "4.0"
+        }
+      },
+      "mdmCommonService": {
+        "uri": "/common/",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "4.0"
+        }
+      }
+    },
+    "crossNavigation": {
+      "inbounds": {
+        "usermanagement-managed": {
+          "semanticObject": "usermanagement",
+          "action": "managed",
+          "title": "{{usermanagement-managed.flpTitle}}",
+          "signature": {
+            "parameters": {},
+            "additionalParameters": "allowed"
+          }
+        }
+      }
+    }
+  },
+  "sap.ui": {
+    "technology": "UI5",
+    "icons": {
+      "icon": "",
+      "favIcon": "",
+      "phone": "",
+      "phone@2": "",
+      "tablet": "",
+      "tablet@2": ""
+    },
+    "deviceTypes": {
+      "desktop": true,
+      "tablet": true,
+      "phone": true
+    }
+  },
+  "sap.ui5": {
+    "flexEnabled": false,
+    "dependencies": {
+      "minUI5Version": "1.150.0",
+      "libs": {
+        "sap.m": {},
+        "sap.ui.core": {},
+        "sap.fe.templates": {}
+      }
+    },
+    "contentDensities": {
+      "compact": true,
+      "cozy": true
+    },
+    "models": {
+      "i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "settings": {
+          "bundleName": "hpbuysell.adm.usermgmt.ui.i18n.i18n"
+        }
+      },
+      "": {
+        "dataSource": "mainService",
+        "preload": true,
+        "settings": {
+          "operationMode": "Server",
+          "autoExpandSelect": true,
+          "earlyRequests": true
+        }
+      },
+      "mdmCommon": {
+        "dataSource": "mdmCommonService",
+        "preload": true,
+        "settings": {
+          "synchronizationMode": "None",
+          "operationMode": "Server",
+          "autoExpandSelect": true
+        }
+      },
+      "@i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "uri": "i18n/i18n.properties"
+      }
+    },
+    "resources": {
+      "css": []
+    },
+    "routing": {
+      "config": {},
+      "routes": [
+        {
+          "pattern": ":?query:",
+          "name": "UsersList",
+          "target": "UsersList"
+        },
+        {
+          "pattern": "Users({key}):?query:",
+          "name": "UsersObjectPage",
+          "target": "UsersObjectPage"
+        }
+      ],
+      "targets": {
+        "UsersList": {
+          "type": "Component",
+          "id": "UsersList",
+          "name": "sap.fe.templates.ListReport",
+          "options": {
+            "settings": {
+              "contextPath": "/Users",
+              "variantManagement": "Page",
+              "navigation": {
+                "Users": {
+                  "detail": {
+                    "route": "UsersObjectPage"
+                  }
+                }
+              },
+              "controlConfiguration": {
+                "@com.sap.vocabularies.UI.v1.LineItem": {
+                  "tableSettings": {
+                    "type": "ResponsiveTable",
+                    "quickVariantSelection": {
+                      "showCounts": true
+                    },
+                    "beforeRebindTable": ".extension.hpbuysell.adm.usermgmt.ui.ext.controller.ExtForListReportPage.onBeforeRebindTable"
+                  }
+                },
+                "@com.sap.vocabularies.UI.v1.SelectionFields": {
+                  "filterFields": {
+                    "CustomerID": {
+                      "label": "{i18n>customerId}",
+                      "property": "customers/partnerId",
+                      "template": "hpbuysell.adm.usermgmt.ui.ext.fragment.CustomFilterForC",
+                      "required": false,
+                      "position": {
+                        "placement": "After",
+                        "anchor": "email"
+                      }
+                    },
+                    "SupplierID": {
+                      "label": "{i18n>supplierId}",
+                      "property": "suppliers/partnerId",
+                      "template": "hpbuysell.adm.usermgmt.ui.ext.fragment.CustomFilterForS",
+                      "required": false,
+                      "position": {
+                        "placement": "Before",
+                        "anchor": "CustomerID"
+                      }
+                    },
+                    "filterbarFieldForProjects": {
+                      "label": "Project Id",
+                      "property": "customers/user_email",
+                      "template": "hpbuysell.adm.usermgmt.ui.ext.fragment.FilterbarFieldForProjects",
+                      "required": false,
+                      "position": {
+                        "placement": "After",
+                        "anchor": "CustomerID"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "UsersObjectPage": {
+          "type": "Component",
+          "id": "UsersObjectPage",
+          "name": "sap.fe.templates.ObjectPage",
+          "options": {
+            "settings": {
+              "editableHeaderContent": false,
+              "contextPath": "/Users",
+              "controlConfiguration": {
+                "customers/@com.sap.vocabularies.UI.v1.LineItem#Customers": {
+                  "columns": {
+                    "CustMngProjColumn": {
+                      "header": "Manage",
+                      "position": {
+                        "anchor": "ProjectsColumn",
+                        "placement": "After"
+                      },
+                      "template": "hpbuysell.adm.usermgmt.ui.ext.fragment.CustMngProjColumn"
+                    },
+                    "ProjectsColumn": {
+                      "header": "Projects",
+                      "position": {
+                        "anchor": "CustNameColumn",
+                        "placement": "After"
+                      },
+                      "template": "hpbuysell.adm.usermgmt.ui.ext.fragment.ProjectsColumn"
+                    },
+                    "CustNameColumn": {
+                      "header": "Customer Name",
+                      "position": {
+                        "anchor": "DataField::partnerId",
+                        "placement": "After"
+                      },
+                      "template": "hpbuysell.adm.usermgmt.ui.ext.fragment.CustNameColumn"
+                    }
+                  }
+                },
+                "suppliers/@com.sap.vocabularies.UI.v1.LineItem#Suppliers": {
+                  "columns": {
+                    "SuppMngProjColumn": {
+                      "header": "Manage",
+                      "position": {
+                        "anchor": "SuppProjectsColumn",
+                        "placement": "After"
+                      },
+                      "template": "hpbuysell.adm.usermgmt.ui.ext.fragment.SuppMngProjColumn"
+                    },
+                    "SuppProjectsColumn": {
+                      "header": "Projects",
+                      "position": {
+                        "anchor": "CustNameColumn",
+                        "placement": "After"
+                      },
+                      "template": "hpbuysell.adm.usermgmt.ui.ext.fragment.SuppProjectsColumn"
+                    },
+                    "CustNameColumn": {
+                      "header": "Supplier Name",
+                      "position": {
+                        "anchor": "DataField::partnerId",
+                        "placement": "After"
+                      },
+                      "template": "hpbuysell.adm.usermgmt.ui.ext.fragment.CustNameColumn"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "extends": {
+      "extensions": {
+        "sap.ui.controllerExtensions": {
+          "sap.fe.templates.ListReport.ListReportController": {
+            "controllerName": "hpbuysell.adm.usermgmt.ui.ext.controller.ExtForListReportPage"
+          }
+        }
+      }
+    }
+  },
+  "sap.fiori": {
+    "registrationIds": [],
+    "archeType": "transactional"
+  },
+  "sap.fe": {
+    "app": {
+      "enableLazyLoading": true
+    }
+  },
+  "sap.cloud": {
+    "public": true,
+    "service": "hpbuysell-adm-usermgmt-service"
+  }
+}
