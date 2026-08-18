@@ -1,5 +1,5 @@
 <core:FragmentDefinition xmlns:core="sap.ui.core" xmlns="sap.m"  xmlns:vh="sap.ui.comp.valuehelpdialog" xmlns:fb="sap.ui.comp.filterbar">
-    <vh:ValueHelpDialog id="vhdForProjectsFilter" title="Select Projects" supportMultiselect="true" key="projectId" descriptionKey="projectName" core:require="{ handler: 'hpbuysell/adm/usermgmt/ui/ext/fragment/SuppMngProjColumn' }"
+    <vh:ValueHelpDialog id="vhdForProjectsFilter" title="Select Projects" supportMultiselect="true" key="wbselement" descriptionKey="wbsdescription" core:require="{handler:'hpbuysell/adm/usermgmt/ui/ext/fragment/SuppMngProjColumn'}"
         ok="handler.vhdForProjects_onOK" cancel="handler.vhdForProjects_onCancel" afterClose="handler.onVHDForProjects_AfterClose">
         <vh:filterBar>
             <fb:FilterBar id="VHDFilterBar" showGoOnFB="true" useToolbar="true" search="handler.onVHDForProjectFilter_Search">

@@ -269,28 +269,28 @@ annotate service.PartnerAssignments with @(
 
 annotate service.PartnerAssignments:partnerId with @(
     Common.ValueList: {
-        CollectionPath: 'BusinessPartnerVH',
+        CollectionPath: 'common/CustomerVH',
         Parameters: [
             {
                 $Type : 'Common.ValueListParameterInOut',
                 LocalDataProperty : partnerId,
-                ValueListProperty : 'partnerId',
+                ValueListProperty : 'customerid',
             },
             {
                 $Type : 'Common.ValueListParameterOut',
-                ValueListProperty : 'partnerName',
+                ValueListProperty : 'customername',
                 LocalDataProperty : partnerName,
             },
-            {
-                $Type : 'Common.ValueListParameterIn',
-                ValueListProperty : 'partnerType',
-                LocalDataProperty : partnerType,
-            },
-            {
-                $Type: 'Common.ValueListParameterIn',
-                ValueListProperty: 'userEmail',
-                LocalDataProperty: ID,
-            },
+            // {
+            //     $Type : 'Common.ValueListParameterIn',
+            //     ValueListProperty : 'partnerType',
+            //     LocalDataProperty : partnerType,
+            // },
+            // {
+            //     $Type: 'Common.ValueListParameterIn',
+            //     ValueListProperty: 'userEmail',
+            //     LocalDataProperty: ID,
+            // },
         ],
         Label : 'Customer ID ID',
     },

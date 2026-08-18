@@ -6,7 +6,7 @@ sap.ui.define([
         _oMultiInput: null,
         onValueHelpRequest: function (oEvent) {
             Handler._oMultiInput = oEvent.getSource();
-            const oModel = Handler._oMultiInput.getModel(),
+            const oModel = this._controller.getView().getModel("commonServiceModel"),
                 bSupplier = Handler._oMultiInput.getId().indexOf("Supplier") >= 0,
                 sTitle = bSupplier ? "Select Suppliers" : "Select Customers",
                 sPath = bSupplier ? "commonServiceModel>/SupplierVH" : "commonServiceModel>/CustomerVH",
@@ -18,8 +18,8 @@ sap.ui.define([
                     title: sTitle,
                     supportMultiselect: true,
                     supportRanges: false,
-                    key: sKey,
-                    descriptionKey: sText,
+                    key: bSupplier ? "supplierid" : "customerid",
+                    descriptionKey: bSupplier ? "suppliername" : "customername",
                     ok: function (oEvent) {
                         const aTokens = oEvent.getParameter("tokens") || [];
                         Handler._oMultiInput.setTokens(aTokens);
@@ -32,22 +32,23 @@ sap.ui.define([
                 oDialog.setTokens(Handler._oMultiInput.getTokens().map(function (oToken) {
                     return new Token({ key: oToken.getKey() });
                 }));
-                oDialog.setModel(oModel);
+                // oDialog.setModel(oModel);
+                oDialog.setModel(oModel, "commonServiceModel");
                 oDialog.getTableAsync().then(function (oTable) {
-                    oTable.setModel(oModel);
+                    oTable.setModel(oModel, "commonServiceModel");
                     if (oTable.bindRows) {
                         oTable.removeAllColumns();
                         oTable.addColumn(new UITableColumn({
                             label: new Text({ text: bSupplier ? "Supplier ID" : "Customer ID" }),
                             template: new Text({ text: "{" + sKey + "}" }),
-                            sortProperty: sKey,
-                            filterProperty: sKey
+                            sortProperty: bSupplier ? "supplierid" : "customerid",
+                            filterProperty: bSupplier ? "supplierid" : "customerid"
                         }));
                         oTable.addColumn(new UITableColumn({
                             label: new Text({ text: bSupplier ? "Supplier Name" : "Customer Name" }),
                             template: new Text({ text: "{" + sText + "}" }),
-                            sortProperty: sText,
-                            filterProperty: sText
+                            sortProperty: bSupplier ? "suppliername" : "customername",
+                            filterProperty: bSupplier ? "suppliername" : "customername"
                         }));
                         oTable.bindRows({ path: sPath });
                     } else {

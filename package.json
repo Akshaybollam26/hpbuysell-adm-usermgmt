@@ -50,6 +50,21 @@
         "auth": "xsuaa",
         "destinations": true,
         "connectivity": true
+      },
+      "MdmCommonService": {
+        "kind": "odata-v4",
+        "model": [],
+        "[development]": {
+          "credentials": {
+            "url": "http://localhost:4005/odata/v4/common"
+          }
+        },
+        "[production]": {
+          "credentials": {
+            "destination": "hpbuysell-mdm-common-srv-dest",
+            "path": "/odata/v4/common"
+          }
+        }
       }
     }
   }
