@@ -23,7 +23,7 @@ sap.ui.define([
                     ok: function (oEvent) {
                         const aTokens = oEvent.getParameter("tokens") || [];
                         Handler._oMultiInput.setTokens(aTokens);
-                        Handler._updateFilterValue(aTokens);
+                        // Handler._updateFilterValue(aTokens);
                         oDialog.close();
                     },
                     cancel: function () { oDialog.close(); },

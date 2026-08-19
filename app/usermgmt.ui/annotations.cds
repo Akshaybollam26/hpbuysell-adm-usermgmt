@@ -269,35 +269,37 @@ annotate service.PartnerAssignments with @(
 
 annotate service.PartnerAssignments:partnerId with @(
     Common.ValueList: {
-        CollectionPath: 'common/CustomerVH',
+        CollectionPath: 'BusinessPartnerVH',
+
         Parameters: [
             {
-                $Type : 'Common.ValueListParameterInOut',
-                LocalDataProperty : partnerId,
-                ValueListProperty : 'customerid',
+                $Type: 'Common.ValueListParameterInOut',
+                LocalDataProperty: partnerId,
+                ValueListProperty: 'partnerId'
             },
             {
-                $Type : 'Common.ValueListParameterOut',
-                ValueListProperty : 'customername',
-                LocalDataProperty : partnerName,
+                $Type: 'Common.ValueListParameterOut',
+                ValueListProperty: 'partnerName',
+                LocalDataProperty: partnerName
             },
-            // {
-            //     $Type : 'Common.ValueListParameterIn',
-            //     ValueListProperty : 'partnerType',
-            //     LocalDataProperty : partnerType,
-            // },
-            // {
-            //     $Type: 'Common.ValueListParameterIn',
-            //     ValueListProperty: 'userEmail',
-            //     LocalDataProperty: ID,
-            // },
+            {
+                $Type: 'Common.ValueListParameterIn',
+                ValueListProperty: 'partnerType',
+                LocalDataProperty: partnerType
+            },
+            {
+                $Type: 'Common.ValueListParameterIn',
+                ValueListProperty: 'userEmail',
+                LocalDataProperty: ID
+            }
         ],
-        Label : 'Customer ID ID',
-    },
-    Common.ValueListWithFixedValues : false,
-    Common.ValueListForValidation : true,
-);
 
+        Label: 'Customer ID'
+    },
+
+    Common.ValueListWithFixedValues: false,
+    Common.ValueListForValidation: true
+);
 annotate service.BusinessPartnerVH with @(
     UI.SelectionFields: [
         partnerId,

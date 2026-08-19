@@ -80,9 +80,9 @@ sap.ui.define([
             var oModel = oController.getView().getModel();
  
             const aChangedProjectList = oController.getView().getModel("projects").oData;
-            const aSelectedProjectsIds = aChangedProjectList.filter(p => p.selected === true).map(p => p.projectId);
-            const aUnselectedProjectsIds = aChangedProjectList.filter(p => p.selected === false).map(p => p.projectId);
-            const aInitialSelectedProjectIds = this._aInitialProjectsList.filter(p => p.selected === true).map(p => p.projectId);
+            const aSelectedProjectsIds = aChangedProjectList.filter(p => p.selected === true).map(p => p.wbselement);
+            const aUnselectedProjectsIds = aChangedProjectList.filter(p => p.selected === false).map(p => p.wbselement);
+            const aInitialSelectedProjectIds = this._aInitialProjectsList.filter(p => p.selected === true).map(p => p.wbselement);
  
             const aProjectsToAdd = aSelectedProjectsIds.filter(id => !aInitialSelectedProjectIds.includes(id));
             const aProjectsToRemove = aUnselectedProjectsIds.filter(id => aInitialSelectedProjectIds.includes(id));
@@ -170,6 +170,7 @@ sap.ui.define([
             this._oManageProjectsDialog = null;
         },
         onVHRequestForProjects: async function(oEvent){
+            const oCommonSrvModel = this._controller.getView().getModel("commonServiceModel");
             this._multiInputField = oEvent.getSource();
             if (!this.vhdForProjectsFilter) {
                 this.vhdForProjectsFilter = await sap.ui.core.Fragment.load({
@@ -199,18 +200,19 @@ sap.ui.define([
                         })
                     ]
                 });
+                oTable.setModel(oCommonSrvModel);
                 oTable.bindItems({
-                    path: "commonServiceModel>/ProjectUAMVH",
+                    path: "ProjectUAMVH",
                     template: new sap.m.ColumnListItem({
                         cells: [
                             new sap.m.Text({
-                                text: "{commonServiceModel>wbselement}"
+                                text: "{wbselement}"
                             }),
                             new sap.m.Text({
-                                text: "{commonServiceModel>wbsdescription}"
+                                text: "{wbsdescription}"
                             }),
                             new sap.m.Text({
-                                text: "{commonServiceModel>companycode}"
+                                text: "{companycode}"
                             })
                         ]
                     })

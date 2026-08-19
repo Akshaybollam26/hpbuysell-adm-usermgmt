@@ -37,8 +37,8 @@
                 <items>
                     <ColumnListItem type="Active" selected="{projects>selected}">
                         <cells>
-                            <Text text="{projects>projectId}"/>
-                            <Text text="{projects>projectName}"/>
+                            <Text text="{projects>wbselement}"/>
+                            <Text text="{projects>wbsdescription}"/>
                         </cells>
                     </ColumnListItem>
                 </items>

@@ -23,7 +23,7 @@ sap.ui.define([
                     ok: function (oEvent) {
                         const aTokens = oEvent.getParameter("tokens") || [];
                         Handler._oMultiInput.setTokens(aTokens);
-                        Handler._updateFilterValue(aTokens);
+                        // Handler._updateFilterValue(aTokens);
                         oDialog.close();
                     },
                     cancel: function () { oDialog.close(); },
@@ -100,15 +100,19 @@ sap.ui.define([
         },
 
         _buildFilter: function (sValue, sPath) {
-            if (!sValue) return null;
-            const aIds = sValue.split(",").map(function (s) { return s.trim(); }).filter(Boolean);
-            if (!aIds.length) return null;
+            if(Handler._oMultiInput){
+                return null;
+            }
+            const aTokens = oMultiInput.getTokens();
+            if (!aTokens.length) {
+                return null;
+            }
             return new Filter({
-                filters: aIds.map(function (sId) {
+                filters: aTokens.map(function (oToken) {
                     return new Filter({
                         path: sPath,
                         operator: FilterOperator.EQ,
-                        value1: sId
+                        value1: oToken.getKey()
                     });
                 }),
                 and: false
