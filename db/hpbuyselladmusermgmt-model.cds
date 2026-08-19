@@ -109,6 +109,7 @@ entity ProjectAssignments : cuid, FlexFields {
     @title: '{i18n>ProjectName}';
 }
 
+
 entity CustomerMaster {
 
     key customerId   : String(20)
@@ -129,7 +130,7 @@ entity SupplierMaster {
         supplierName : String(100)
         @title: '{i18n>SupplierName}';
 
-        status       : String(1);
+        status       : String(1);        
 }
 
 
@@ -140,15 +141,15 @@ entity ProjectMaster {
 
         projectName : String(100)
         @title: '{i18n>ProjectName}';
-
-        status      : String(1);
+        
+        status       : String(1);
 }
 
 entity UserGroups : managed, FlexFields {
 
     key user      : Association to Users;
-    
+
     key groupId   : String;
-    
-    groupName : String(255);
+
+        groupName : String(255);
 }

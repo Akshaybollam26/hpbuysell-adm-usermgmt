@@ -6,6 +6,7 @@ sap.ui.define([
         _oMultiInput: null,
         onValueHelpRequest: function (oEvent) {
             Handler._oMultiInput = oEvent.getSource();
+            this._oMultiInput = oEvent.getSource();
             const oModel = this._controller.getView().getModel("commonServiceModel"),
                 bSupplier = Handler._oMultiInput.getId().indexOf("Supplier") >= 0,
                 sTitle = bSupplier ? "Select Suppliers" : "Select Customers",
@@ -23,7 +24,8 @@ sap.ui.define([
                     ok: function (oEvent) {
                         const aTokens = oEvent.getParameter("tokens") || [];
                         Handler._oMultiInput.setTokens(aTokens);
-                        // Handler._updateFilterValue(aTokens);
+                        Handler._updateFilterValue(aTokens);
+                        // Handler._buildFilter("","customers/partnerId");
                         oDialog.close();
                     },
                     cancel: function () { oDialog.close(); },
@@ -70,13 +72,16 @@ sap.ui.define([
                 oDialog.open();
             });
         },
+        onLiveChangeOfC: function(oEvent){
+            if(!Handler._oMultiInput)
+                Handler._oMultiInput = oEvent.getSource();
+        },
         onTokenUpdate: function (oEvent) {
             setTimeout(function () { Handler._updateFilterValue(oEvent.getSource().getTokens()); }, 0);
         },
         _updateFilterValue: function (aTokens) {
             Handler._oMultiInput.setValue(aTokens.map(function (oToken) { return oToken.getKey(); }).join(","));
         },
-
         /*
          * Two separate filter functions, one per navigation path.
          * filterItems (used by CustFilter.fragment.xml's MultiInput)
@@ -100,23 +105,39 @@ sap.ui.define([
         },
 
         _buildFilter: function (sValue, sPath) {
-            if(Handler._oMultiInput){
-                return null;
-            }
-            const aTokens = oMultiInput.getTokens();
-            if (!aTokens.length) {
-                return null;
-            }
+            if (!sValue) return null;
+            const aIds = sValue.split(",").map(function (s) { return s.trim(); }).filter(Boolean);
+            if (!aIds.length) return null;
             return new Filter({
-                filters: aTokens.map(function (oToken) {
+                filters: aIds.map(function (sId) {
                     return new Filter({
-                        path: sPath,
+                        path: "suppliers/partnerId",
                         operator: FilterOperator.EQ,
-                        value1: oToken.getKey()
+                        value1: sId
                     });
                 }),
                 and: false
             });
+            // if(!(Handler._oMultiInput)){
+            //     return null;
+            // }
+            // const aTokens = Handler._oMultiInput.getTokens();
+            // // sValue = Handler._oMultiInput.getValue();
+            // if (!aTokens.length && !sValue) {
+            //     return null;
+            // }
+            // var aFilters = aTokens.map(function (oToken) {
+            //     return new Filter({
+            //         path: sPath,
+            //         operator: FilterOperator.EQ,
+            //         value1: oToken.getKey()
+            //     });
+            // });
+            // sValue && aFilters.push(new Filter({ path: sPath, operator: FilterOperator.EQ, value1: sValue }));
+            // return new Filter({
+            //     filters: aFilters,
+            //     and: false
+            // });
         }
     };
     return Handler;

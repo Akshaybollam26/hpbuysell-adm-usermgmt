@@ -202,17 +202,17 @@ sap.ui.define([
                 });
                 oTable.setModel(oCommonSrvModel, "commonServiceModel");
                 oTable.bindItems({
-                    path: "ProjectUAMVH",
+                    path: "commonServiceModel>/ProjectUAMVH",
                     template: new sap.m.ColumnListItem({
                         cells: [
                             new sap.m.Text({
-                                text: "{wbselement}"
+                                text: "{commonServiceModel>wbselement}"
                             }),
                             new sap.m.Text({
-                                text: "{wbsdescription}"
+                                text: "{commonServiceModel>wbsdescription}"
                             }),
                             new sap.m.Text({
-                                text: "{companycode}"
+                                text: "{commonServiceModel>companycode}"
                             })
                         ]
                     })

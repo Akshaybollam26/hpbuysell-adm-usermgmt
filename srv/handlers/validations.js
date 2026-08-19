@@ -5,9 +5,9 @@ module.exports = (srv) => {
         Users,
         PartnerAssignments,
         ProjectAssignments,
-        CustomerMaster,
-        SupplierMaster,
-        ProjectMaster,
+        CustomerVH,
+        SupplierVH,
+        ProjectUAMVH,
         UserGroups
     } = srv.entities;
 
@@ -211,10 +211,9 @@ module.exports = (srv) => {
          */
         if (finalPartnerType === 'C' && finalPartnerId) {
             const customer = await SELECT.one
-                .from(CustomerMaster)
+                .from(CustomerVH)
                 .where({
-                    customerId: finalPartnerId,
-                    status: 'A'
+                    customerId: finalPartnerId
                 });
 
             if (!customer) {
@@ -229,10 +228,9 @@ module.exports = (srv) => {
 
         if (finalPartnerType === 'S' && finalPartnerId) {
             const supplier = await SELECT.one
-                .from(SupplierMaster)
+                .from(SupplierVH)
                 .where({
-                    supplierId: finalPartnerId,
-                    status: 'A'
+                    supplierId: finalPartnerId
                 });
 
             if (!supplier) {
@@ -319,6 +317,7 @@ module.exports = (srv) => {
      */
 
     srv.before(['CREATE', 'UPDATE'], ProjectAssignments, async (req) => {
+        const mdmService = await cds.connect.to('MdmCommonService');
         const { projectId } = req.data;
 
         let existingAssignment = null;
@@ -346,15 +345,14 @@ module.exports = (srv) => {
 
         /*
          * Validate project exists and is active.
-         * Auto-populate projectName from ProjectMaster.
+         * Auto-populate projectName from ProjectUAMVH.
          */
         if (finalProjectId) {
-            const project = await SELECT.one
-                .from(ProjectMaster)
+            const project = await mdmService.run(SELECT.one
+                .from(ProjectUAMVH)
                 .where({
-                    projectId: finalProjectId,
-                    status: 'A'
-                });
+                    wbselement: finalProjectId
+                }));
 
             if (!project) {
                 return req.reject(

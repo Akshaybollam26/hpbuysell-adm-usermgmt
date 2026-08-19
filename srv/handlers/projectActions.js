@@ -6,7 +6,7 @@ module.exports = (srv) => {
     const {
         PartnerAssignments,
         ProjectAssignments,
-        ProjectMaster,
+        ProjectUAMVH,
         Users,
         UserGroups
     } = srv.entities;
@@ -40,6 +40,7 @@ module.exports = (srv) => {
      */
 
     srv.on('addProjects', async (req) => {
+        const mdmService = await cds.connect.to('MdmCommonService');
         const { partnerID, isActiveEntity, projectIds } = req.data;
         const isActive = isActiveEntity !== false;
 
@@ -60,12 +61,7 @@ module.exports = (srv) => {
 
         const uniqueProjectIds = [...new Set(projectIds)];
 
-        const activeProjects = await SELECT
-            .from(ProjectMaster)
-            .where({
-                projectId: { in: uniqueProjectIds },
-                status: 'A'
-            });
+        const activeProjects = await mdmService.run(SELECT.from(ProjectUAMVH).where({wbselement: { in: uniqueProjectIds }}));
 
         if (activeProjects.length !== uniqueProjectIds.length) {
             return req.reject(400, 'One or more selected projects do not exist or are inactive');
@@ -78,12 +74,12 @@ module.exports = (srv) => {
         const existingProjectIds = new Set(existingAssignments.map(row => row.projectId));
 
         const projectsToInsert = activeProjects
-            .filter(project => !existingProjectIds.has(project.projectId))
+            .filter(project => !existingProjectIds.has(project.wbselement))
             .map(project => ({
                 ID: cds.utils.uuid(),
                 partner_ID: partnerID,
-                projectId: project.projectId,
-                projectName: project.projectName,
+                projectId: project.wbselement,
+                projectName: project.wbsdescription,
                 ...(isActive ? {} : {
                     IsActiveEntity: false,
                     DraftAdministrativeData_DraftUUID: partner.DraftAdministrativeData_DraftUUID
@@ -121,20 +117,13 @@ module.exports = (srv) => {
 
         const uniqueProjectIds = [...new Set(projectIds)];
 
-        const assignmentsToDelete = await SELECT
-            .from(ProjectTarget)
-            .where({
-                partner_ID: partnerID,
-                projectId: { in: uniqueProjectIds }
-            });
+        const assignmentsToDelete = await SELECT.from(ProjectTarget).where({partner_ID: partnerID,projectId: { in: uniqueProjectIds }});
 
         if (!assignmentsToDelete.length) {
             return true;
         }
 
-        await DELETE
-            .from(ProjectTarget)
-            .where({ ID: { in: assignmentsToDelete.map(row => row.ID) } });
+        await DELETE.from(ProjectTarget).where({ ID: { in: assignmentsToDelete.map(row => row.ID) } });
 
         return true;
     });
@@ -392,22 +381,9 @@ module.exports = (srv) => {
         for (const dbUser of existingUsers) {
 
             if (!scimEmails.has(dbUser.email) && dbUser.active) {
-
-                await UPDATE(Users)
-                    .set({
-                        active: false,
-                        userGroupIndicator: ''
-                    })
-                    .where({
-                        email: dbUser.email
-                    });
-
-                await DELETE.from(UserGroups)
-                    .where({
-                        user_email: dbUser.email
-                    });
-                await DELETE.from(PartnerAssignments)
-                    .where({ user_email: dbUser.email });
+                await UPDATE(Users).set({active: false,userGroupIndicator: ''}).where({email: dbUser.email});
+                await DELETE.from(UserGroups).where({user_email: dbUser.email});
+                await DELETE.from(PartnerAssignments).where({ user_email: dbUser.email });
             }
         }
     })
@@ -419,32 +395,25 @@ module.exports = (srv) => {
      * correctly reflects projects already added/removed in this session
      * but not yet saved.
      */
-    srv.on('findSelectedProjects', async (req) => {
-        const { partnerID, isActiveEntity } = req.data;
-        const isActive = isActiveEntity !== false;
+    // srv.on('findSelectedProjects', async (req) => {
+    //     const mdmService = await cds.connect.to('MdmCommonService');
+    //     const { partnerID, isActiveEntity } = req.data;
+    //     const isActive = isActiveEntity !== false;
 
-        if (!partnerID) {
-            return [];
-        }
+    //     if (!partnerID) {
+    //         return [];
+    //     }
 
-        const ProjectTarget = isActive ? ProjectAssignments : ProjectAssignments.drafts;
+    //     const ProjectTarget = isActive ? ProjectAssignments : ProjectAssignments.drafts;
 
-        const assignedProjects = await SELECT
-            .from(ProjectTarget)
-            .columns('projectId')
-            .where({ partner_ID: partnerID });
+    //     const assignedProjects = await SELECT.from(ProjectTarget).columns('projectId').where({ partner_ID: partnerID });
 
-        const assignedProjectIDs = assignedProjects.map(p => p.projectId);
-
-        const allProjects = await SELECT
-            .from(ProjectMaster)
-            .where({ status: 'A' });
-
-        return allProjects.map(project => ({
-            ...project,
-            selected: assignedProjectIDs.includes(project.projectId)
-        }));
-    });
+    //     const assignedProjectIDs = assignedProjects.map(p => p.projectId);
+    //     console.log("ProjectUAMVH Console", ProjectUAMVH)
+    //     const allProjects = await mdmService.run(SELECT.from('ProjectUAMVH'));
+    //     console.log("allProjects", allProjects)
+    //     return allProjects.map(project => ({...project, selected: assignedProjectIDs.includes(project.projectId)}));
+    // });
     srv.on('deactivateUserMain', async (req) => {
         const useremail = req.params[0].email;
         console.log(useremail)
@@ -453,10 +422,7 @@ module.exports = (srv) => {
         if(!userData.active){
             req.reject(404, `${useremail} has already been deactived.`);
         }
-        await UPDATE(Users).set({
-            active: false,
-            userGroupIndicator: ''
-        }).where({ email: useremail });
+        await UPDATE(Users).set({active: false, userGroupIndicator: ''}).where({ email: useremail });
 
         await DELETE.from(UserGroups).where({ user_email: useremail })
         await DELETE.from(PartnerAssignments)

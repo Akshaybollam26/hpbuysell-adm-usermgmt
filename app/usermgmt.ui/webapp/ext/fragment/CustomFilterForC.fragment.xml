@@ -6,6 +6,7 @@
         core:require="{handler: 'hpbuysell/adm/usermgmt/ui/ext/fragment/CustomFilterForC'}"
         valueHelpRequest="handler.onValueHelpRequest"
         tokenUpdate="handler.onTokenUpdate"
+        liveChange="handler.onLiveChangeOfC"
         value="{
             path: 'filterValues>',
             type: 'sap.fe.macros.filter.type.Value',

@@ -1,5 +1,10 @@
 using {hpbuysell.adm.usermgmt as db} from '../db/hpbuyselladmusermgmt-model';
 using {sap.changelog as cl} from '@cap-js/change-tracking';
+using {
+    mdm_common_metadata.Customer as MdmCustomerVH,
+    mdm_common_metadata.Supplier as MdmSupplierVH,
+    mdm_common_metadata.ProjectUAMVH as MdmProjectUAMVH
+} from './external/mdm-common-metadata';
 
 @changelog.Ui.ChangeHistoryView 
 service UserManagementService 
@@ -58,51 +63,29 @@ service UserManagementService
     entity PartnerAssignments as projection on db.PartnerAssignments;
  
     entity ProjectAssignments as projection on db.ProjectAssignments;
+
+    @readonly
+    entity CustomerVH as projection on MdmCustomerVH;
+
+    @readonly
+    entity SupplierVH as projection on MdmSupplierVH;
+
+    @readonly
+    entity ProjectUAMVH as projection on MdmProjectUAMVH;
  
     @readonly
     @restrict: [{ grant: 'READ', to: ['UsermgmtViewer', 'UsermgmtManage'] }]
     entity ChangeView as projection on cl.ChangeView;
 
-
-    @readonly
-    entity CustomerMaster     as projection on db.CustomerMaster
-                                 where
-                                     status = 'A';
- 
-    @readonly
-    entity SupplierMaster     as projection on db.SupplierMaster
-                                 where
-                                     status = 'A';
- 
-    @readonly
-    entity ProjectMaster      as projection on db.ProjectMaster
-                                 where
-                                     status = 'A';
  
     entity BusinessPartnerVH  as
-            
-            select from SupplierMaster {
-                key supplierId   as partnerId,
-                    cast(
-                        null as String(10)
-                    )            as customerId,
-                    supplierId   as supplierId,
-                    supplierName as partnerName,
-                    cast(
-                        'S' as String(1)
-                    )            as partnerType,
-                    cast(
-                        null as String(241)
-                    )            as userEmail
-            }
-            union all
-            select from CustomerMaster {
-                key customerId   as partnerId,
-                    customerId   as customerId,
+            select from CustomerVH {
+                key customerid   as partnerId,
+                    customerid   as customerId,
                     cast(
                         null as String(10)
                     )            as supplierId,
-                    customerName as partnerName,
+                    customername as partnerName,
                     cast(
                         'C' as String(1)
                     )            as partnerType,
@@ -110,12 +93,27 @@ service UserManagementService
                         null as String(241)
                     )            as userEmail
             }
-;
+            union all
+            select from SupplierVH {
+                key supplierid   as partnerId,
+                    cast(
+                        null as String(10)
+                    )            as customerId,
+                    supplierid   as supplierId,
+                    suppliername as partnerName,
+                    cast(
+                        'S' as String(1)
+                    )            as partnerType,
+                    cast(
+                        null as String(241)
+                    )            as userEmail
+            };
+
     entity UserGroups as projection on db.UserGroups;
     function searchUsers(searchTerm: String)                                                       returns array of Users;
-    function getUnassignedCustomers(userEmail: String, isActiveEntity: Boolean)                    returns array of CustomerMaster;
-    function getUnassignedSuppliers(userEmail: String, isActiveEntity: Boolean)                    returns array of SupplierMaster;
-    function findSelectedProjects(partnerID: UUID, isActiveEntity: Boolean)                        returns array of ProjectMaster;
+    function getUnassignedCustomers(userEmail: String, isActiveEntity: Boolean)                    returns array of CustomerVH;
+    function getUnassignedSuppliers(userEmail: String, isActiveEntity: Boolean)                    returns array of SupplierVH;
+    function findSelectedProjects(partnerID: UUID, isActiveEntity: Boolean)                        returns array of ProjectUAMVH;
         
     action   exportUsers(emails: array of String)                                                  returns {
         fileName : String;

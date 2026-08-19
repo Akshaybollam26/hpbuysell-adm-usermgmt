@@ -1,9 +1,12 @@
+const { error } = require("@sap/cds");
+const { SELECT } = require("@sap/cds/lib/ql/cds-ql");
+
 module.exports = (srv) => {
     const {
         Users,
         PartnerAssignments,
         ProjectAssignments,
-        ProjectMaster,
+        ProjectUAMVH,
         BusinessPartnerVH
     } = srv.entities;
 
@@ -37,13 +40,18 @@ module.exports = (srv) => {
      * the actual filtering logic below is entirely computed here, not
      * evaluated by the database.
      */
-    srv.on('READ', BusinessPartnerVH, async (req, next) => {
+    srv.on('READ', BusinessPartnerVH, async req => {
+        const mdm = await cds.connect.to('MdmCommonService');
         const whereArr = req.query.SELECT.where;
-        console.log(JSON.stringify(req.query, null, 2));
- 
+
+        console.log(
+            '[DEBUG BusinessPartnerVH READ]',
+            JSON.stringify(req.query, null, 2)
+        );
+
         function extractEqValue(fieldName) {
             if (!Array.isArray(whereArr)) return undefined;
- 
+
             for (let i = 0; i < whereArr.length; i++) {
                 if (
                     whereArr[i]?.ref?.[0] === fieldName &&
@@ -53,69 +61,202 @@ module.exports = (srv) => {
                     return whereArr[i + 2].val;
                 }
             }
- 
+
             return undefined;
         }
- 
+
         function stripCondition(fieldName) {
             if (!Array.isArray(whereArr)) return;
+
             for (let i = 0; i < whereArr.length; i++) {
-                if (whereArr[i]?.ref?.[0] === fieldName && whereArr[i + 1] === '=') {
-                    const clauseStart = i > 0 && (whereArr[i - 1] === 'and' || whereArr[i - 1] === 'or') ? i - 1 : i;
-                    const clauseEnd = whereArr[i + 3] === 'and' || whereArr[i + 3] === 'or' ? i + 3 : i + 2;
-                    whereArr.splice(clauseStart, clauseEnd - clauseStart + 1);
+                if (
+                    whereArr[i]?.ref?.[0] === fieldName &&
+                    whereArr[i + 1] === '='
+                ) {
+                    const clauseStart =
+                        i > 0 &&
+                            (whereArr[i - 1] === 'and' ||
+                                whereArr[i - 1] === 'or')
+                            ? i - 1
+                            : i;
+
+                    const clauseEnd =
+                        whereArr[i + 3] === 'and' ||
+                            whereArr[i + 3] === 'or'
+                            ? i + 3
+                            : i + 2;
+
+                    whereArr.splice(
+                        clauseStart,
+                        clauseEnd - clauseStart + 1
+                    );
+
                     return;
                 }
             }
         }
- 
+
         const rowID = extractEqValue('userEmail');
         let partnerType = extractEqValue('partnerType');
- 
-        console.log('[DEBUG BusinessPartnerVH READ] rowID:', rowID, '| partnerType:', partnerType);
- 
-        if (!rowID) {
-            return next();
+
+        console.log(
+            '[DEBUG BusinessPartnerVH READ] rowID:',
+            rowID,
+            '| partnerType:',
+            partnerType
+        );
+
+        /*
+         * Get the owner information only when userEmail
+         * was supplied in the request.
+         */
+        let userEmail;
+
+        if (rowID) {
+            stripCondition('userEmail');
+
+            const [draftRow, activeRow] = await Promise.all([
+                SELECT.one
+                    .from(PartnerAssignments.drafts)
+                    .where({ ID: rowID }),
+
+                SELECT.one
+                    .from(PartnerAssignments)
+                    .where({ ID: rowID })
+            ]);
+
+            const ownerRow = draftRow || activeRow;
+
+            if (ownerRow?.user_email) {
+                userEmail = ownerRow.user_email;
+
+                if (!partnerType) {
+                    partnerType = ownerRow.partnerType;
+                }
+            }
         }
- 
-        stripCondition('userEmail');
- 
-        const [draftRow, activeRow] = await Promise.all([
-            SELECT.one.from(PartnerAssignments.drafts).where({ ID: rowID }),
-            SELECT.one.from(PartnerAssignments).where({ ID: rowID })
+
+        /*
+         * Get Suppliers and Customers from MDM.
+         */
+        const [suppliers, customers] = await Promise.all([
+            mdm.run(
+                SELECT.from('Supplier').columns(
+                    'supplierid',
+                    'suppliername'
+                )
+            ),
+
+            mdm.run(
+                SELECT.from('Customer').columns(
+                    'customerid',
+                    'customername'
+                )
+            )
         ]);
-        const ownerRow = draftRow || activeRow;
- 
-        if (!ownerRow?.user_email) {
-            return next();
-        }
- 
-        const userEmail = ownerRow.user_email;
-        if (!partnerType) partnerType = ownerRow.partnerType;
- 
-        const candidates = await next();
-        const candidateList = Array.isArray(candidates) ? candidates : [candidates].filter(Boolean);
- 
-        // Check if draft data exists for this user
-        const draftAssignments = await
-        SELECT.from(PartnerAssignments.drafts)
-            .columns('partnerId')
-            .where(partnerType? { user_email: userEmail, partnerType} : { user_email: userEmail });
- 
-        let assignedIDs;
-        if (draftAssignments.length > 0) {
-            assignedIDs = new Set(draftAssignments.map(r => r.partnerId).filter(Boolean));
-        }
-        else {
-            const activeAssignments = await SELECT.from(PartnerAssignments)
-            .columns('partnerId').where(partnerType ? { user_email: userEmail, partnerType } : { user_email: userEmail});
- 
-            assignedIDs = new Set(
-                activeAssignments.map(r => r.partnerId).filter(Boolean)
+
+        /*
+         * Build BusinessPartnerVH result.
+         */
+        let candidateList = [
+            ...suppliers.map(s => ({
+                partnerId: s.supplierid,
+                customerId: null,
+                supplierId: s.supplierid,
+                partnerName: s.suppliername,
+                partnerType: 'S',
+                userEmail: null
+            })),
+
+            ...customers.map(c => ({
+                partnerId: c.customerid,
+                customerId: c.customerid,
+                supplierId: null,
+                partnerName: c.customername,
+                partnerType: 'C',
+                userEmail: null
+            }))
+        ];
+
+        /*
+         * Apply partnerType filter.
+         */
+        if (partnerType) {
+            candidateList = candidateList.filter(
+                row => row.partnerType === partnerType
             );
         }
- 
-        return candidateList.filter(row => !assignedIDs.has(row.partnerId));
+
+        /*
+         * If we don't have a user, there is nothing to exclude.
+         * Return the MDM data directly.
+         *
+         * IMPORTANT:
+         * Do NOT call next() because BusinessPartnerVH
+         * has @cds.persistence.skip.
+         */
+        if (!userEmail) {
+            return candidateList;
+        }
+
+        /*
+         * Get assignments from draft first.
+         */
+        const draftAssignments = await SELECT.from(
+            PartnerAssignments.drafts
+        )
+            .columns('partnerId')
+            .where(
+                partnerType
+                    ? {
+                        user_email: userEmail,
+                        partnerType: partnerType
+                    }
+                    : {
+                        user_email: userEmail
+                    }
+            );
+
+        let assignedIDs;
+
+        if (draftAssignments.length > 0) {
+            assignedIDs = new Set(
+                draftAssignments
+                    .map(row => row.partnerId)
+                    .filter(Boolean)
+            );
+        } else {
+            /*
+             * No draft assignments, so use active assignments.
+             */
+            const activeAssignments = await SELECT.from(
+                PartnerAssignments
+            )
+                .columns('partnerId')
+                .where(
+                    partnerType
+                        ? {
+                            user_email: userEmail,
+                            partnerType: partnerType
+                        }
+                        : {
+                            user_email: userEmail
+                        }
+                );
+
+            assignedIDs = new Set(
+                activeAssignments
+                    .map(row => row.partnerId)
+                    .filter(Boolean)
+            );
+        }
+
+        /*
+         * Remove already-assigned partners.
+         */
+        return candidateList.filter(
+            row => !assignedIDs.has(row.partnerId)
+        );
     });
 
     /*
@@ -247,14 +388,12 @@ module.exports = (srv) => {
         ];
 
         if (!assignedCustomerIDs.length) {
-            return SELECT.from('CustomerMaster')
-                .where({ status: 'A' });
+            return SELECT.from('CustomerVH')
         }
         const unassignedCustomers = await SELECT
-            .from('CustomerMaster')
+            .from('CustomerVH')
             .where({
-                customerId: { not: { in: assignedCustomerIDs } },
-                status: 'A'
+                customerId: { not: { in: assignedCustomerIDs } }
             });
 
         return unassignedCustomers;
@@ -283,13 +422,12 @@ module.exports = (srv) => {
         ];
 
         if (!assignedSupplierIDs.length) {
-            return SELECT.from('SupplierMaster').where({ status: 'A' });
+            return SELECT.from('SupplierVH')
         }
         const unassignedSuppliers = await SELECT
-            .from('SupplierMaster')
+            .from('SupplierVH')
             .where({
-                supplierId: { not: { in: assignedSupplierIDs } },
-                status: 'A'
+                supplierId: { not: { in: assignedSupplierIDs } }
             });
 
         return unassignedSuppliers;
@@ -297,14 +435,42 @@ module.exports = (srv) => {
     srv.on('findSelectedProjects', async (req) => {
         const { partnerID, isActiveEntity } = req.data;
         const isActive = isActiveEntity !== false;
+        const mdmService = await cds.connect.to('MdmCommonService');
+        const partnerTarget = isActive ? PartnerAssignments  : PartnerAssignments.drafts;
 
+        const oPartnerRecord = await SELECT.one.from(partnerTarget).where({ID :partnerID})
+        console.log(oPartnerRecord);
         console.log('[DEBUG findSelectedProjects] req.data:', req.data, '| partnerID:', partnerID, '| isActive:', isActive);
 
         if (!partnerID) {
             console.log('[DEBUG findSelectedProjects] partnerID missing - returning []');
             return [];
         }
-
+        var sTargetProfile = "";
+        //try to select single from customer master for the given partner id - if yes it is customer, if not it is supplier
+        const oCustomer = await mdmService.run(SELECT.one.from('CustomerVH').where({ customerid: oPartnerRecord.partnerId }));
+        console.log(oCustomer, "co=ust")
+        if (oCustomer)
+            sTargetProfile = "customer";
+        else {
+            const oSupplier = await mdmService.run(SELECT.one.from('SupplierVH').where({ supplierid: oPartnerRecord.partnerId }));
+            console.log(oSupplier);
+            if (oSupplier)
+                sTargetProfile = "suppliercode";
+        }
+        // const allRelevantProjects = await SELECT.from(ProjectUAMVH).where({ sTargetProfile: partnerID });
+        let allRelevantProjects = [];
+        if (sTargetProfile !== "") {
+            if (sTargetProfile === "customer") allRelevantProjects = await mdmService.run(SELECT.from('ProjectUAMVH').where({ customer : oPartnerRecord.partnerId }));
+            if (sTargetProfile === "suppliercode") allRelevantProjects = await mdmService.run(SELECT.from('ProjectUAMVH').where({ suppliercode : oPartnerRecord.partnerId }));
+        }
+        else {
+            req.error(
+                400,
+                `Cannot manage projects - entered partner profile is not part of the master data`
+            );
+        }
+        console.log(allRelevantProjects);
         const ProjectTarget = isActive ? ProjectAssignments : ProjectAssignments.drafts;
 
         const assignedProjects = await SELECT
@@ -312,14 +478,13 @@ module.exports = (srv) => {
             .columns('projectId')
             .where({ partner_ID: partnerID });
 
-        const allProjects = await SELECT.from(ProjectMaster).where({ status: 'A' });
-
-        console.log('[DEBUG findSelectedProjects] assignedProjects:', assignedProjects, '| allProjects count:', allProjects.length);
-
+        // const allProjects = await SELECT.from(ProjectUAMVH).where({customer: partnerID });
+        console.log('[DEBUG findSelectedProjects] assignedProjects:', assignedProjects, '| allRelevantProjects count:', allRelevantProjects.length);
+        console.log(allRelevantProjects);
         const assignedProjectIDs = assignedProjects.map(p => p.projectId);
-        return allProjects.map(project => ({
+        return allRelevantProjects.map(project => ({
             ...project,
-            selected: assignedProjectIDs.includes(project.projectId)
+            selected: assignedProjectIDs.includes(project.wbselement)
         }));
     });
     srv.on('searchUsers', async (req) => {

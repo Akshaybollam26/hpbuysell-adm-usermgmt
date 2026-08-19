@@ -2,9 +2,11 @@
   "name": "hpbuysell_adm_usermgmt",
   "version": "1.0.0",
   "dependencies": {
-    "@cap-js/change-tracking": "^2.1.0",
+    "@cap-js/change-tracking": "2.0",
     "@cap-js/postgres": "^2",
+    "@sap-cloud-sdk/connectivity": "^4",
     "@sap-cloud-sdk/http-client": "^4.8.0",
+    "@sap-cloud-sdk/resilience": "^4",
     "@sap/cds": "^9",
     "@sap/xssec": "^4",
     "axios": "^1.19.0",
@@ -37,7 +39,7 @@
       "db": {
         "kind": "postgres",
         "credentials": {
-          "schema": "hpbuysell_adm_usermgmt"
+          "schema": "hpbuysell_adm_usermgmt_1"
         }
       },
       "IAS_SCIM": {
@@ -53,10 +55,12 @@
       },
       "MdmCommonService": {
         "kind": "odata-v4",
-        "model": [],
+        "model": "srv/external/mdm-common",
+        "service": "mdm_common_metadata",
         "[development]": {
           "credentials": {
-            "url": "http://localhost:4005/odata/v4/common"
+            "destination": "hpbuysell-mdm-common-srv-dest",
+            "path": "/odata/v4/common"
           }
         },
         "[production]": {
@@ -65,6 +69,10 @@
             "path": "/odata/v4/common"
           }
         }
+      },
+      "mdm_common_metadata": {
+        "kind": "odata",
+        "model": "srv/external/mdm-common-metadata"
       }
     }
   }
