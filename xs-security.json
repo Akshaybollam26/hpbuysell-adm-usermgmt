@@ -1,6 +1,7 @@
 {
   "xsappname": "hpbuysell-adm-usermgmt",
   "tenant-mode": "dedicated",
+  "description": "Security profile of UAM",
   "scopes": [
     {
       "name": "$XSAPPNAME.UsermgmtViewer",

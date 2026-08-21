@@ -55,7 +55,7 @@ annotate PartnerAssignments
  *
  * projectId identifies the project assignment.
  */
-annotate ProjectAssignments with @changelog: [projectId] {
+annotate ProjectAssignments with @changelog: [projectId, projectName] {
     projectId   @changelog;
     projectName @changelog;
 };

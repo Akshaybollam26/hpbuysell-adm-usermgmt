@@ -39,13 +39,13 @@
       "db": {
         "kind": "postgres",
         "credentials": {
-          "schema": "hpbuysell_adm_usermgmt_1"
+          "schema": "hpbuysell_adm_usermgmt"
         }
       },
-      "IAS_SCIM": {
+      "hpbuysell-ias-scim-dest": {
         "kind": "rest",
         "credentials": {
-          "destination": "IAS_SCIM"
+          "destination": "hpbuysell-ias-scim-dest"
         }
       },
       "[production]": {
@@ -73,7 +73,8 @@
       "mdm_common_metadata": {
         "kind": "odata",
         "model": "srv/external/mdm-common-metadata"
-      }
+      },
+      "cloud-logging": true
     }
   }
 }

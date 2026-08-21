@@ -110,41 +110,6 @@ entity ProjectAssignments : cuid, FlexFields {
 }
 
 
-entity CustomerMaster {
-
-    key customerId   : String(20)
-        @title: '{i18n>CustomerId}';
-
-        customerName : String(100)
-        @title: '{i18n>CustomerName}';
-
-        status       : String(1);
-}
-
-
-entity SupplierMaster {
-
-    key supplierId   : String(20)
-        @title: '{i18n>SupplierId}';
-
-        supplierName : String(100)
-        @title: '{i18n>SupplierName}';
-
-        status       : String(1);        
-}
-
-
-entity ProjectMaster {
-
-    key projectId   : String(20)
-        @title: '{i18n>ProjectId}';
-
-        projectName : String(100)
-        @title: '{i18n>ProjectName}';
-        
-        status       : String(1);
-}
-
 entity UserGroups : managed, FlexFields {
 
     key user      : Association to Users;

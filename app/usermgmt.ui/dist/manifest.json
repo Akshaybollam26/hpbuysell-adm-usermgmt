@@ -54,7 +54,7 @@
 		"technology": "UI5",
 		"icons": {
 			"icon": "",
-			"favIcon": "",
+			"favIcon": "sap-icon://account",
 			"phone": "",
 			"phone@2": "",
 			"tablet": "",

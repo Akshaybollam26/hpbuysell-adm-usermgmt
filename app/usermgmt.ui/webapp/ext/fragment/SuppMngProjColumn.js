@@ -78,7 +78,7 @@ sap.ui.define([
         onOkProjects: async function (oEvent) {
             var oController = this._controller;
             var oModel = oController.getView().getModel();
- 
+            
             const aChangedProjectList = oController.getView().getModel("projects").oData;
             const aSelectedProjectsIds = aChangedProjectList.filter(p => p.selected === true).map(p => p.wbselement);
             const aUnselectedProjectsIds = aChangedProjectList.filter(p => p.selected === false).map(p => p.wbselement);
@@ -179,7 +179,7 @@ sap.ui.define([
                 });
                 this._controller.getView().addDependent(this.vhdForProjectsFilter);
                 this.vhdForProjectsFilter.setContentHeight("80%");
-                this.vhdForProjectsFilter.setModel(oCommonSrvModel, "commonServiceModel");
+                this.vhdForProjectsFilter.setModel(oCommonSrvModel);
                 var oTable = new sap.m.Table({
                     mode: sap.m.ListMode.MultiSelect,
                     columns: [
@@ -200,19 +200,19 @@ sap.ui.define([
                         })
                     ]
                 });
-                oTable.setModel(oCommonSrvModel, "commonServiceModel");
+                oTable.setModel(oCommonSrvModel);
                 oTable.bindItems({
-                    path: "commonServiceModel>/ProjectUAMVH",
+                    path: "/ProjectCompanyVH",
                     template: new sap.m.ColumnListItem({
                         cells: [
                             new sap.m.Text({
-                                text: "{commonServiceModel>wbselement}"
+                                text: "{wbselement}"
                             }),
                             new sap.m.Text({
-                                text: "{commonServiceModel>wbsdescription}"
+                                text: "{wbsdescription}"
                             }),
                             new sap.m.Text({
-                                text: "{commonServiceModel>companycode}"
+                                text: "{companycode}"
                             })
                         ]
                     })

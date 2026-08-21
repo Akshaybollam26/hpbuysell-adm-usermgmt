@@ -21,8 +21,8 @@ sap.ui.define([
                     ok: function (oEvent) {
                         const aTokens = oEvent.getParameter("tokens") || [];
                         Handler._oMultiInput.setTokens(aTokens);
-                        // Handler._updateFilterValue(aTokens);
-                        Handler._buildFilter("","suppliers/partnerId");
+                        Handler._updateFilterValue(aTokens);
+                        // Handler._buildFilter("","suppliers/partnerId");
                         oDialog.close();
                     },
                     cancel: function () { oDialog.close(); },
@@ -90,22 +90,35 @@ sap.ui.define([
             return Handler._buildFilter(sValue, "suppliers/partnerId");
         },
         _buildFilter: function(sValue, sPath){
-            const aTokens = Handler._oMultiInput.getTokens();
-            if (!aTokens.length && !sValue) {
-                return null;
-            }
-            var aFilters = aTokens.map(function (oToken) {
-                return new Filter({
-                    path: sPath,
-                    operator: FilterOperator.EQ,
-                    value1: oToken.getKey()
-                });
-            });
-            sValue && aFilters.push(new Filter({ path: sPath, operator: FilterOperator.EQ, value1: sValue }));
+            if (!sValue) return null;
+            const aIds = sValue.split(",").map(function (s) { return s.trim(); }).filter(Boolean);
+            if (!aIds.length) return null;
             return new Filter({
-                filters: aFilters,
+                filters: aIds.map(function (sId) {
+                    return new Filter({
+                        path: sPath,
+                        operator: FilterOperator.EQ,
+                        value1: sId
+                    });
+                }),
                 and: false
             });
+            // const aTokens = Handler._oMultiInput.getTokens();
+            // if (!aTokens.length && !sValue) {
+            //     return null;
+            // }
+            // var aFilters = aTokens.map(function (oToken) {
+            //     return new Filter({
+            //         path: sPath,
+            //         operator: FilterOperator.EQ,
+            //         value1: oToken.getKey()
+            //     });
+            // });
+            // sValue && aFilters.push(new Filter({ path: sPath, operator: FilterOperator.EQ, value1: sValue }));
+            // return new Filter({
+            //     filters: aFilters,
+            //     and: false
+            // });
         }
     };
     return Handler;

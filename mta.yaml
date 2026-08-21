@@ -1,6 +1,6 @@
 _schema-version: 3.3.0
 ID: hpbuysell-adm-usermgmt
-description: A simple CAP project.
+description: User Managment Application
 version: 1.0.0
 modules:
   - name: hpbuysell-adm-usermgmt-srv
@@ -10,7 +10,8 @@ modules:
       - name: uaa_hpbuysell-adm-usermgmt
       - name: hpbuysell-adm-usermgmt-destination-service
       - name: hpbuysell-adm-usermgmt-connectivity
-      - name: ust-portfolio-db
+      - name: buysell-dev-pgdb
+      - name: hpbuysell_adm_usermgmt-cloud-logging
     provides:
       - name: srv-api
         properties:
@@ -44,21 +45,6 @@ modules:
               TokenServiceInstanceName: hpbuysell-adm-usermgmt-xsuaa-service
               TokenServiceKeyName: uaa_hpbuysell-adm-usermgmt-key
               URL: ~{srv-api/srv-url}
-              sap.cloud.service: hpbuysell-adm-usermgmt-service
-            - Authentication: OAuth2UserTokenExchange
-              Name: hpbuysell-adm-usermgmt-srv-dest
-              TokenServiceInstanceName: hpbuysell-adm-usermgmt-xsuaa-service
-              TokenServiceKeyName: uaa_hpbuysell-adm-usermgmt-key
-              URL: ~{srv-api/srv-url}
-              sap.cloud.service: hpbuysell-adm-usermgmt-service
-            - Name: hpbuysell-adm-common-srv-dest1
-              Description: HP Buy-Sell MDM Common OData V4 Service
-              URL: https://org-build-build-ai-subaccount-code-migration-space-btp-14b7b11c.cfapps.us10-001.hana.ondemand.com
-              Authentication: OAuth2UserTokenExchange
-              TokenServiceInstanceName: hpbuysell-adm-usermgmt-xsuaa-service
-              TokenServiceKeyName: hpbuysell-adm-usermgmt-key
-              HTML5.DynamicDestination: true
-              HTML5.ForwardAuthToken: false
               sap.cloud.service: hpbuysell-adm-usermgmt-service
             - Name: approuter_hpbuysell_adm_UserMgmt_html_repo_host
               ServiceInstanceName: hpbuysell-adm-usermgmt-html5-app-host-service
@@ -108,7 +94,7 @@ modules:
         - name: deploy-to-postgresql
           command: npm start
     requires:
-      - name: ust-portfolio-db
+      - name: buysell-dev-pgdb
 resources:
   - name: hpbuysell-adm-usermgmt-destination-service
     type: org.cloudfoundry.managed-service
@@ -151,7 +137,7 @@ resources:
       service-name: hpbuysell-adm-usermgmt-xsuaa-service
       service-plan: application
       config:
-        xsappname: hpbuysell-adm-usermgmt-${org}-${space}
+        xsappname: hpbuysell-adm-usermgmt
         tenant-mode: dedicated
         oauth2-configuration:
           credential-types:
@@ -162,11 +148,19 @@ resources:
     parameters:
       service: connectivity
       service-plan: lite
-  - name: ust-portfolio-db
-    type: org.cloudfoundry.managed-service
+  - name: buysell-dev-pgdb
+    type: org.cloudfoundry.existing-service
     parameters:
       service: postgresql-db
-      service-plan: free
+      service-plan: standard
+  - name: hpbuysell_adm_usermgmt-cloud-logging
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: cloud-logging
+      service-plan: standard
+      config:
+        ingest_otlp:
+          enabled: true
 
 parameters:
   deploy_mode: html5-repo

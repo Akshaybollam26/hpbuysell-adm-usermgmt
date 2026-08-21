@@ -80,10 +80,10 @@ module.exports = (srv) => {
     srv.before("SAVE", Users.drafts, async (req) => {
         const sUserEmail = req.data.email;
         // Get all partner assignments currently present in the User draft
-        const userRecord = await SELECT.one.from(Users).where({email: sUserEmail});
+        const userRecord = await SELECT.one.from(Users).where({ email: sUserEmail });
         // console.log(userRecord); 
         //validate if editor is from finance group - Y? let them save without validation
-        const userGroupRecords = await SELECT.from(UserGroups).where({user_email : sUserEmail});
+        const userGroupRecords = await SELECT.from(UserGroups).where({ user_email: sUserEmail });
         console.log(userGroupRecords);
         for (const each of userGroupRecords) {
             console.log(each.groupId, each.groupName);
@@ -144,9 +144,6 @@ module.exports = (srv) => {
         let existingAssignment = null;
 
         if (req.event === 'UPDATE') {
-            const ID =
-                req.data.ID ||
-                req.params?.[0]?.ID;
 
             existingAssignment = await SELECT.one
                 .from(PartnerAssignments)
@@ -167,7 +164,7 @@ module.exports = (srv) => {
              * validation below and is unaffected by this check.
              */
             if (
-                'partnerType' in req.data &&
+                'partnerType' in req.data && 
                 req.data.partnerType !== existingAssignment.partnerType
             ) {
                 return req.reject(
@@ -177,22 +174,12 @@ module.exports = (srv) => {
             }
 
             if (
-                'partnerId' in req.data &&
-                req.data.partnerId !== existingAssignment.partnerId
+                'partnerId' in req.data && req.data.partnerId && req.data.partnerId !== existingAssignment.partnerId
             ) {
+                await DELETE.from(ProjectTarget).where({partner_ID: ID});
                 return req.reject(
                     400,
                     'Partner ID cannot be changed once created'
-                );
-            }
-
-            if (
-                'partnerName' in req.data &&
-                req.data.partnerName !== existingAssignment.partnerName
-            ) {
-                return req.reject(
-                    400,
-                    'Partner Name cannot be changed once created'
                 );
             }
         }
@@ -210,11 +197,7 @@ module.exports = (srv) => {
          * Also auto-populate partnerName from master data.
          */
         if (finalPartnerType === 'C' && finalPartnerId) {
-            const customer = await SELECT.one
-                .from(CustomerVH)
-                .where({
-                    customerId: finalPartnerId
-                });
+            const customer = await SELECT.one.from(CustomerVH).where({customerId: finalPartnerId});
 
             if (!customer) {
                 return req.reject(
@@ -248,63 +231,18 @@ module.exports = (srv) => {
          * Same user cannot have same Customer/Supplier ID twice.
          */
         if (req.event === 'CREATE') {
-            const userEmail =
-                req.data.user_email ||
-                req.data.user?.email;
-
-            if (
-                userEmail &&
-                finalPartnerType &&
-                finalPartnerId
-            ) {
-                const duplicate = await SELECT.one
-                    .from(PartnerAssignments)
-                    .where({
-                        user_email: userEmail,
-                        partnerType: finalPartnerType,
-                        partnerId: finalPartnerId
-                    });
-
-                if (duplicate) {
-                    return req.reject(
-                        400,
-                        'Duplicate Customer/Supplier ID for user'
-                    );
-                }
+            const userEmail = req.data.user_email || req.data.user?.email;
+            if ( userEmail && finalPartnerType && finalPartnerId ) {
+                const duplicate = await SELECT.one.from(PartnerAssignments).where({user_email: userEmail,partnerType: finalPartnerType,partnerId: finalPartnerId });
+                if (duplicate) { return req.reject(400, 'Duplicate Customer/Supplier ID for user')}
             }
         }
-
         if (req.event === 'UPDATE') {
-            const ID =
-                req.data.ID ||
-                req.params?.[0]?.ID;
-
-            const userEmail =
-                req.data.user_email ||
-                existingAssignment?.user_email;
-
-            if (
-                userEmail &&
-                finalPartnerType &&
-                finalPartnerId
-            ) {
-                const duplicate = await SELECT.one
-                    .from(PartnerAssignments)
-                    .where({
-                        user_email: userEmail,
-                        partnerType: finalPartnerType,
-                        partnerId: finalPartnerId
-                    });
-
-                if (
-                    duplicate &&
-                    duplicate.ID !== ID
-                ) {
-                    return req.reject(
-                        400,
-                        'Duplicate Customer/Supplier ID for user'
-                    );
-                }
+            const ID = req.data.ID || req.params?.[0]?.ID;
+            const userEmail = req.data.user_email || existingAssignment?.user_email;
+            if ( userEmail && finalPartnerType && finalPartnerId ) {
+                const duplicate = await SELECT.one.from(PartnerAssignments).where({user_email: userEmail,partnerType: finalPartnerType,partnerId: finalPartnerId});
+                if ( duplicate && duplicate.ID !== ID ) { return req.reject( 400, 'Duplicate Customer/Supplier ID for user' ); }
             }
         }
     });
