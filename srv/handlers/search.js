@@ -43,12 +43,6 @@ module.exports = (srv) => {
     srv.on('READ', BusinessPartnerVH, async req => {
         const mdm = await cds.connect.to('MdmCommonService');
         const whereArr = req.query.SELECT.where;
-
-        console.log(
-            '[DEBUG BusinessPartnerVH READ]',
-            JSON.stringify(req.query, null, 2)
-        );
-
         function extractEqValue(fieldName) {
             if (!Array.isArray(whereArr)) return undefined;
 
@@ -98,13 +92,6 @@ module.exports = (srv) => {
 
         const rowID = extractEqValue('userEmail');
         let partnerType = extractEqValue('partnerType');
-
-        console.log(
-            '[DEBUG BusinessPartnerVH READ] rowID:',
-            rowID,
-            '| partnerType:',
-            partnerType
-        );
 
         /*
          * Get the owner information only when userEmail
@@ -277,7 +264,6 @@ module.exports = (srv) => {
         }
         const val = sSearch[0].val
         const like = `%${val}%`;
-        console.log(sSearch);
         /*
          * 1. Search direct user fields.
          */
@@ -353,7 +339,6 @@ module.exports = (srv) => {
                     in: emails
                 }
             });
-        console.log(result);
         return result;
     });
     srv.on('getUnassignedCustomers', async (req) => {
@@ -369,7 +354,6 @@ module.exports = (srv) => {
          * picked again from the value help - producing a duplicate once
          * the draft is saved.
          */
-        console.log("Drafts:", drafts);
         const [activeAssigned, draftAssigned] = await Promise.all([
             SELECT.from(PartnerAssignments)
                 .columns('partnerId')
@@ -436,33 +420,25 @@ module.exports = (srv) => {
         const { partnerID, isActiveEntity } = req.data;
         const isActive = isActiveEntity !== false;
         const mdmService = await cds.connect.to('MdmCommonService');
-        const partnerTarget = isActive ? PartnerAssignments  : PartnerAssignments.drafts;
+        const partnerTarget = isActive ? PartnerAssignments : PartnerAssignments.drafts;
 
-        const oPartnerRecord = await SELECT.one.from(partnerTarget).where({ID :partnerID})
-        console.log(oPartnerRecord);
-        console.log('[DEBUG findSelectedProjects] req.data:', req.data, '| partnerID:', partnerID, '| isActive:', isActive);
-
-        if (!partnerID) {
-            console.log('[DEBUG findSelectedProjects] partnerID missing - returning []');
-            return [];
-        }
+        const oPartnerRecord = await SELECT.one.from(partnerTarget).where({ ID: partnerID })
+        if (!partnerID) return [];
         var sTargetProfile = "";
         //try to select single from customer master for the given partner id - if yes it is customer, if not it is supplier
         const oCustomer = await mdmService.run(SELECT.one.from('CustomerVH').where({ customerid: oPartnerRecord.partnerId }));
-        console.log(oCustomer, "co=ust")
         if (oCustomer)
             sTargetProfile = "customer";
         else {
             const oSupplier = await mdmService.run(SELECT.one.from('SupplierVH').where({ supplierid: oPartnerRecord.partnerId }));
-            console.log(oSupplier);
             if (oSupplier)
                 sTargetProfile = "suppliercode";
         }
         // const allRelevantProjects = await SELECT.from(ProjectUAMVH).where({ sTargetProfile: partnerID });
         let allRelevantProjects = [];
         if (sTargetProfile !== "") {
-            if (sTargetProfile === "customer") allRelevantProjects = await mdmService.run(SELECT.from('ProjectUAMVH').where({ customer : oPartnerRecord.partnerId }));
-            if (sTargetProfile === "suppliercode") allRelevantProjects = await mdmService.run(SELECT.from('ProjectUAMVH').where({ suppliercode : oPartnerRecord.partnerId }));
+            if (sTargetProfile === "customer") allRelevantProjects = await mdmService.run(SELECT.from('ProjectUAMVH').where({ customer: oPartnerRecord.partnerId }));
+            if (sTargetProfile === "suppliercode") allRelevantProjects = await mdmService.run(SELECT.from('ProjectUAMVH').where({ suppliercode: oPartnerRecord.partnerId }));
         }
         else {
             req.error(
@@ -470,19 +446,23 @@ module.exports = (srv) => {
                 `Cannot manage projects - entered partner profile is not part of the master data`
             );
         }
-        console.log(allRelevantProjects);
         const ProjectTarget = isActive ? ProjectAssignments : ProjectAssignments.drafts;
 
         const assignedProjects = await SELECT
             .from(ProjectTarget)
             .columns('projectId')
             .where({ partner_ID: partnerID });
-
+        const uniqueProjects = [
+            ...new Map(
+                allRelevantProjects.map(project => [
+                    project.wbselement,
+                    project
+                ])
+            ).values()
+        ];
         // const allProjects = await SELECT.from(ProjectUAMVH).where({customer: partnerID });
-        console.log('[DEBUG findSelectedProjects] assignedProjects:', assignedProjects, '| allRelevantProjects count:', allRelevantProjects.length);
-        console.log(allRelevantProjects);
         const assignedProjectIDs = assignedProjects.map(p => p.projectId);
-        return allRelevantProjects.map(project => ({
+        return uniqueProjects.map(project => ({
             ...project,
             selected: assignedProjectIDs.includes(project.wbselement)
         }));

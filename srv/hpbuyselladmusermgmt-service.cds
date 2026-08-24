@@ -121,6 +121,7 @@ service UserManagementService
     };
     action   addProjects(partnerID: UUID, isActiveEntity: Boolean, projectIds: array of String)    returns array of ProjectAssignments;
     action   removeProjects(partnerID: UUID, isActiveEntity: Boolean, projectIds: array of String) returns Boolean;
-    action syncusers();
+    @(requires: 'JOBSCHEDULER')
+    action syncusers() returns String;
     
 }

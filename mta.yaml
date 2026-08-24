@@ -12,6 +12,7 @@ modules:
       - name: hpbuysell-adm-usermgmt-connectivity
       - name: buysell-dev-pgdb
       - name: hpbuysell_adm_usermgmt-cloud-logging
+      - name: buysell-jobscheduler-resource
     provides:
       - name: srv-api
         properties:
@@ -123,6 +124,10 @@ resources:
       service-plan: lite
     requires:
       - name: srv-api
+  - name: buysell-jobscheduler-resource
+    type: org.cloudfoundry.existing-service
+    parameters:
+      service-name: buysell-dev-jobscheduler
   - name: hpbuysell-adm-usermgmt_html_repo_host
     type: org.cloudfoundry.managed-service
     parameters:

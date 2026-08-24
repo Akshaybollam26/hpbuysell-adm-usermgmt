@@ -10,6 +10,13 @@
     {
       "name": "$XSAPPNAME.UsermgmtManage",
       "description": "UsermgmtManage"
+    },
+    {
+      "name": "$XSAPPNAME.JOBSCHEDULER",
+      "description": "Scope for BTP Job Scheduling Service",
+      "grant-as-authority-to-apps": [
+        "$XSSERVICENAME(buysell-dev-jobscheduler)"
+      ]
     }
   ],
   "attributes": [],

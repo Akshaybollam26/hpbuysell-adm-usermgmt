@@ -13,7 +13,6 @@ sap.ui.define([
                 sPath = bSupplier ? "commonServiceModel>/SupplierVH" : "commonServiceModel>/CustomerVH",
                 sKey = bSupplier ? "commonServiceModel>supplierid" : "commonServiceModel>customerid",
                 sText = bSupplier ? "commonServiceModel>suppliername" : "commonServiceModel>customername";
-            debugger;
             sap.ui.require(["sap/ui/comp/valuehelpdialog/ValueHelpDialog"], function (ValueHelpDialog) {
                 const oDialog = new ValueHelpDialog({
                     title: sTitle,

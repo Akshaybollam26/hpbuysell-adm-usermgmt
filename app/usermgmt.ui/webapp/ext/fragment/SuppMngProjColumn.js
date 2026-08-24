@@ -30,8 +30,6 @@ sap.ui.define([
             const sPartnerId = oPartner.partnerId;
             this._sPartnerUuid = oPartner.ID;
             const isActiveEntity = oPartner.IsActiveEntity !== false;
- 
-            debugger;
             // const sPath = oContext.getPath();
             // // /Users(email='ava.taylor%40hp.com',IsActiveEntity=false)/suppliers(...)
             // // const sUserPath = sPath.substring(0, sPath.indexOf("/suppliers"));
@@ -88,7 +86,6 @@ sap.ui.define([
             const aProjectsToRemove = aUnselectedProjectsIds.filter(id => aInitialSelectedProjectIds.includes(id));
  
             const isActiveEntity = this._oPartnerAssignmentContext.getObject().IsActiveEntity !== false;
-            debugger;
             try {
                 if (aProjectsToAdd.length) {
                     await oModel.bindContext("/addProjects(...)")
@@ -148,7 +145,6 @@ sap.ui.define([
             const oButton = oEvent.getSource();
             const oDialog = oButton.getParent().getParent();
             const oTable = oDialog.getContent()[1];
-            console.log(oTable);
             if (oTable) {
                 oTable.removeSelections(true);
             }
@@ -248,9 +244,6 @@ sap.ui.define([
             //get values present inside filter items and create filters of them
             //refresh binding of the table while passing filters
         },
-        onTokenUpdate :  function(oEvent){
-            console.log("testing");
-        },
         vhdForProjects_onOK: function(oEvent){
             // const oTable = this.vhdForProjectsFilter.getContent()[0];
             // const aSelectedItems = oTable.getSelectedItems();
@@ -287,7 +280,6 @@ sap.ui.define([
             this.vhdForProjectsFilter = null;
         },
         vhdForProjects_onCancel: function(oEvent){
-            debugger;
             this.vhdForProjectsFilter.close();
             this.vhdForProjectsFilter.destroy();
             this.vhdForProjectsFilter = null;

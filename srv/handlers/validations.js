@@ -81,14 +81,10 @@ module.exports = (srv) => {
         const sUserEmail = req.data.email;
         // Get all partner assignments currently present in the User draft
         const userRecord = await SELECT.one.from(Users).where({ email: sUserEmail });
-        // console.log(userRecord); 
         //validate if editor is from finance group - Y? let them save without validation
         const userGroupRecords = await SELECT.from(UserGroups).where({ user_email: sUserEmail });
-        console.log(userGroupRecords);
         for (const each of userGroupRecords) {
-            console.log(each.groupId, each.groupName);
             if (each.groupId === "HP_BUYSELL_CUSTOMER_FINANCE_VIEWER_GRP") {
-                console.log("reached here");
                 return; // exits the entire handler
             }
         }
