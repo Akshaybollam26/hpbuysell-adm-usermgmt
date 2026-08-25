@@ -159,66 +159,39 @@ module.exports = (srv) => {
              * updated - that's handled entirely by the ProjectAssignments
              * validation below and is unaffected by this check.
              */
-            if (
-                'partnerType' in req.data && 
-                req.data.partnerType !== existingAssignment.partnerType
-            ) {
-                return req.reject(
-                    400,
-                    'Partner Type cannot be changed once created'
-                );
+            if ('partnerType' in req.data && req.data.partnerType !== existingAssignment.partnerType) {
+                return req.reject( 400, 'Partner Type cannot be changed once created' );
             }
 
-            if (
-                'partnerId' in req.data && req.data.partnerId && req.data.partnerId !== existingAssignment.partnerId
-            ) {
-                await DELETE.from(ProjectTarget).where({partner_ID: ID});
-                return req.reject(
-                    400,
-                    'Partner ID cannot be changed once created'
-                );
+            if ('partnerId' in req.data && req.data.partnerId && req.data.partnerId !== existingAssignment.partnerId) {
+                await DELETE.from(ProjectTarget).where({ partner_ID: ID });
+                return req.reject(400, 'Partner ID cannot be changed once created');
             }
         }
 
-        const finalPartnerType =
-            partnerType ||
-            existingAssignment?.partnerType;
+        const finalPartnerType = partnerType || existingAssignment?.partnerType;
 
-        const finalPartnerId =
-            partnerId ||
-            existingAssignment?.partnerId;
+        const finalPartnerId = partnerId || existingAssignment?.partnerId;
 
         /*
          * Validate Customer/Supplier against active master data.
          * Also auto-populate partnerName from master data.
          */
         if (finalPartnerType === 'C' && finalPartnerId) {
-            const customer = await SELECT.one.from(CustomerVH).where({customerId: finalPartnerId});
+            const customer = await SELECT.one.from(CustomerVH).where({ customerId: finalPartnerId });
 
             if (!customer) {
-                return req.reject(
-                    400,
-                    `Customer ID '${finalPartnerId}' does not exist in the master data or is inactive`
-                );
+                return req.reject(400, `Customer ID '${finalPartnerId}' does not exist in the master data or is inactive`);
             }
 
             req.data.partnerName = customer.customerName;
         }
 
         if (finalPartnerType === 'S' && finalPartnerId) {
-            const supplier = await SELECT.one
-                .from(SupplierVH)
-                .where({
-                    supplierId: finalPartnerId
-                });
-
+            const supplier = await SELECT.one.from(SupplierVH).where({supplierId: finalPartnerId});
             if (!supplier) {
-                return req.reject(
-                    400,
-                    `Supplier ID '${finalPartnerId}' does not exist in the master data or is inactive`
-                );
+                return req.reject(400, `Supplier ID '${finalPartnerId}' does not exist in the master data or is inactive`);
             }
-
             req.data.partnerName = supplier.supplierName;
         }
 
@@ -228,21 +201,30 @@ module.exports = (srv) => {
          */
         if (req.event === 'CREATE') {
             const userEmail = req.data.user_email || req.data.user?.email;
-            if ( userEmail && finalPartnerType && finalPartnerId ) {
-                const duplicate = await SELECT.one.from(PartnerAssignments).where({user_email: userEmail,partnerType: finalPartnerType,partnerId: finalPartnerId });
-                if (duplicate) { return req.reject(400, 'Duplicate Customer/Supplier ID for user')}
-            }
-        }
-        if (req.event === 'UPDATE') {
-            const ID = req.data.ID || req.params?.[0]?.ID;
-            const userEmail = req.data.user_email || existingAssignment?.user_email;
-            if ( userEmail && finalPartnerType && finalPartnerId ) {
-                const duplicate = await SELECT.one.from(PartnerAssignments).where({user_email: userEmail,partnerType: finalPartnerType,partnerId: finalPartnerId});
-                if ( duplicate && duplicate.ID !== ID ) { return req.reject( 400, 'Duplicate Customer/Supplier ID for user' ); }
+            if (userEmail && finalPartnerType && finalPartnerId) {
+                const duplicate = await SELECT.one.from(PartnerAssignments).where({ user_email: userEmail, partnerType: finalPartnerType, partnerId: finalPartnerId });
+                if (duplicate) { return req.reject(400, 'Duplicate Customer/Supplier ID for user') }
             }
         }
     });
 
+    srv.before('UPDATE', PartnerAssignments.drafts, async (req) => {
+
+        const ID = req.data.ID || req.params?.[0]?.ID;
+
+        if (!ID) return req.reject(400, 'Partner assignment ID is missing');
+
+        const existingAssignment = await SELECT.one.from(PartnerAssignments.drafts).where({ ID });
+        if (!existingAssignment) return req.reject(404, 'Partner assignment not found');
+
+        const partnerIdChanged ='partnerId' in req.data && req.data.partnerId && req.data.partnerId !== existingAssignment.partnerId;
+
+        const partnerTypeChanged = 'partnerType' in req.data && req.data.partnerType && req.data.partnerType !== existingAssignment.partnerType;
+
+        if (partnerIdChanged || partnerTypeChanged) {
+            await DELETE.from(ProjectAssignments.drafts).where({ partner_ID: ID});
+        }
+    });
 
     /*
      * PROJECT ASSIGNMENT VALIDATIONS

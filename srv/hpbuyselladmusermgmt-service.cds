@@ -111,10 +111,7 @@ service UserManagementService
 
     entity UserGroups as projection on db.UserGroups;
     function searchUsers(searchTerm: String)                                                       returns array of Users;
-    function getUnassignedCustomers(userEmail: String, isActiveEntity: Boolean)                    returns array of CustomerVH;
-    function getUnassignedSuppliers(userEmail: String, isActiveEntity: Boolean)                    returns array of SupplierVH;
     function findSelectedProjects(partnerID: UUID, isActiveEntity: Boolean)                        returns array of ProjectUAMVH;
-        
     action   exportUsers(emails: array of String)                                                  returns {
         fileName : String;
         base64   : LargeString;

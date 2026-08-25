@@ -48,8 +48,8 @@ sap.ui.define([
                 this._aInitialProjectsList = aProjects.map(project => ({ ...project }));
                 oController.getView().setModel(new JSONModel(aProjects), "projects");
             } catch (oError) {
-                MessageToast.show("Unable to load projects");
-                console.error(oError);
+                // MessageToast.show("Unable to load or find projects related to selected partner");
+                MessageToast.show(oError);
                 return;
             }
             if (!this._oManageProjectsDialog) {

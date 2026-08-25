@@ -262,6 +262,9 @@
         "sap.ui.controllerExtensions": {
           "sap.fe.templates.ListReport.ListReportController": {
             "controllerName": "hpbuysell.adm.usermgmt.ui.ext.controller.ExtForListReportPage"
+          },
+          "sap.fe.templates.ObjectPage.ObjectPageController": {
+            "controllerName": "hpbuysell.adm.usermgmt.ui.ext.controller.ExtForObjReportPage"
           }
         }
       }

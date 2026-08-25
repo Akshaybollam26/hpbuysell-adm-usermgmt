@@ -249,6 +249,17 @@ annotate service.UserGroups with @(
     ]
 );
 
+annotate service.PartnerAssignments with @Common.SideEffects: {
+    SourceProperties: [
+        'partnerId',
+        'partnerType'
+    ],
+    TargetEntities: [
+        {
+            $NavigationPropertyPath: 'projects'
+        }
+    ]
+};
 
 annotate service.PartnerAssignments with @(
     UI.LineItem #Customers: [

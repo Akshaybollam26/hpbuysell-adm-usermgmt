@@ -14,7 +14,7 @@ using {
  * managed fields createdAt, createdBy, modifiedAt and modifiedBy
  * are intentionally not annotated.
  */
-annotate Users with @changelog: [email] {
+annotate Users with {
     email              @changelog;
     firstName          @changelog;
     lastName           @changelog;
@@ -33,7 +33,7 @@ annotate Users with @changelog: [email] {
  *
  * groupName is the readable identifier shown in Change History.
  */
-annotate UserGroups with @changelog: [groupName] {
+annotate UserGroups with {
     groupId   @changelog;
     groupName @changelog;
 };
@@ -43,8 +43,7 @@ annotate UserGroups with @changelog: [groupName] {
  *
  * Both the type and ID identify the assignment.
  */
-annotate PartnerAssignments
-    with @changelog: [partnerType, partnerId] {
+annotate PartnerAssignments with{
         partnerType @changelog;
         partnerId   @changelog;
         partnerName @changelog;
@@ -55,7 +54,7 @@ annotate PartnerAssignments
  *
  * projectId identifies the project assignment.
  */
-annotate ProjectAssignments with @changelog: [projectId, projectName] {
+annotate ProjectAssignments with {
     projectId   @changelog;
     projectName @changelog;
 };
