@@ -97,7 +97,7 @@ sap.ui.define([
                 filters: aIds.map(function (sId) {
                     return new Filter({
                         path: sPath,
-                        operator: FilterOperator.EQ,
+                        operator: FilterOperator.Contains,
                         value1: sId
                     });
                 }),

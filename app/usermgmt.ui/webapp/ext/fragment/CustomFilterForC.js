@@ -110,8 +110,8 @@ sap.ui.define([
             return new Filter({
                 filters: aIds.map(function (sId) {
                     return new Filter({
-                        path: "suppliers/partnerId",
-                        operator: FilterOperator.EQ,
+                        path: sPath,
+                        operator: FilterOperator.Contains,
                         value1: sId
                     });
                 }),

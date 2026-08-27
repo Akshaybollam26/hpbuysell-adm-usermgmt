@@ -37,6 +37,7 @@
           "semanticObject": "usermanagement",
           "action": "managed",
           "title": "{{usermanagement-managed.flpTitle}}",
+          "icon": "sap-icon://shipping-status",
           "signature": {
             "parameters": {},
             "additionalParameters": "allowed"
@@ -48,7 +49,7 @@
   "sap.ui": {
     "technology": "UI5",
     "icons": {
-      "icon": "sap-icon://account",
+      "icon": "",
       "favIcon": "",
       "phone": "",
       "phone@2": "",
