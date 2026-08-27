@@ -4,8 +4,12 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
-    "sap/m/Token"
-], function (Fragment, MessageToast, JSONModel, Filter, FilterOperator, Token) {
+    "sap/m/Token",
+    "sap/m/Popover",
+    "sap/m/List",
+    "sap/m/StandardListItem",
+    "sap/m/PlacementType"
+], function (Fragment, MessageToast, JSONModel, Filter, FilterOperator, Token, Popover, List, StandardListItem, PlacementType) {
     'use strict';
  
     return {
@@ -30,15 +34,6 @@ sap.ui.define([
             const sPartnerId = oPartner.partnerId;
             this._sPartnerUuid = oPartner.ID;
             const isActiveEntity = oPartner.IsActiveEntity !== false;
-            // const sPath = oContext.getPath();
-            // // /Users(email='ava.taylor%40hp.com',IsActiveEntity=false)/suppliers(...)
-            // // const sUserPath = sPath.substring(0, sPath.indexOf("/suppliers"));
-            // const sUserPath = oContext.getPath().replace(/\/(customers|suppliers)\(.*\)$/, "");
-            // const oUserContext = oContext.getModel().bindContext(sUserPath);
-            // await oUserContext.requestObject();
-            // const sEmail = oUserContext.getObject().email;
-            // const sUserEmail = oEvent.getSource().getBindingContext().getPath().match(/email='([^']+)'/)[1];
- 
             try {
                 const oOperation = oModel.bindContext(`/findSelectedProjects(...)`);
                 oOperation.setParameter("partnerID", this._sPartnerUuid);
@@ -58,6 +53,29 @@ sap.ui.define([
                 });
             }
             this._oManageProjectsDialog.open();
+        },
+        onListTokenRendering: function(oEvent){
+            oEvent.preventDefault(); // suppress default token-text popover
+            const oTokenizer = oEvent.getSource();
+
+            if (!this._oProjectsPopover) {
+                this._oProjectsPopover = new Popover({
+                    placement: PlacementType.Auto,
+                    content: new List({
+                        items: {
+                            path: "projects",
+                            template: new StandardListItem({
+                                title: "{= ${projectName} + ' (' + ${projectId} + ')' }"
+                            })
+                        }
+                    })
+                }).addStyleClass("sapUiContentPadding");
+
+                this._controller.getView().addDependent(this._oProjectsPopover);
+            }
+
+            this._oProjectsPopover.setBindingContext(oTokenizer.getBindingContext());
+            this._oProjectsPopover.openBy(oTokenizer);
         },
         onSearchProjects: async function (oEvent) {
             const sValue = oEvent.getParameter("newValue");

@@ -7,10 +7,35 @@
         valueHelpRequest="handler.onValueHelpRequest"
         tokenUpdate="handler.onTokenUpdate"
         liveChange="handler.onLiveChangeOfC"
+        showSuggestion="true"
+        suggestionRows="{commonServiceModel>/CustomerVH}"
         value="{
             path: 'filterValues>',
             type: 'sap.fe.macros.filter.type.Value',
             formatOptions: { operator: 'hpbuysell.adm.usermgmt.ui.ext.fragment.CustomFilterForC.filterItems' }
         }">
+		<suggestionColumns>
+			<Column
+				hAlign="Begin"
+				popinDisplay="Inline"
+				demandPopin="true">
+				<Label text="Customer Id"/>
+			</Column>
+			<Column
+				hAlign="Center"
+				popinDisplay="Inline"
+				demandPopin="true"
+				minScreenWidth="Tablet">
+				<Label text="Customer Name"/>
+			</Column>
+		</suggestionColumns>
+		<suggestionRows>
+			<ColumnListItem>
+			<cells>
+				<Label text="{commonServiceModel>customerid}"/>
+				<Label text="{commonServiceModel>customername}"/>
+			</cells>
+			</ColumnListItem>
+		</suggestionRows>
     </MultiInput>
 </core:FragmentDefinition>

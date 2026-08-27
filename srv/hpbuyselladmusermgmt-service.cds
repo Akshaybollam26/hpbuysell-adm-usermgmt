@@ -108,6 +108,7 @@ service UserManagementService
                         null as String(241)
                     )            as userEmail
             };
+            // order by partnerId;
 
     entity UserGroups as projection on db.UserGroups;
     function searchUsers(searchTerm: String)                                                       returns array of Users;
