@@ -42,7 +42,7 @@ service UserManagementService
     ]
     @odata.draft.enabled
     @(Capabilities: {
-        InsertRestrictions: {Insertable: true},
+        InsertRestrictions: {Insertable: false},
         DeleteRestrictions: {Deletable: false},
         UpdateRestrictions: {Updatable: true}
     })

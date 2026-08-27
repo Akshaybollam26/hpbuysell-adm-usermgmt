@@ -48,8 +48,8 @@
   "sap.ui": {
     "technology": "UI5",
     "icons": {
-      "icon": "",
-      "favIcon": "sap-icon://account",
+      "icon": "sap-icon://account",
+      "favIcon": "",
       "phone": "",
       "phone@2": "",
       "tablet": "",
@@ -130,7 +130,7 @@
           "options": {
             "settings": {
               "contextPath": "/Users",
-              "variantManagement": "Page",
+              "variantManagement": "Control",
               "navigation": {
                 "Users": {
                   "detail": {
@@ -171,7 +171,7 @@
                       }
                     },
                     "filterbarFieldForProjects": {
-                      "label": "Project Id",
+                      "label": "{i18n>Project ID}",
                       "property": "customers/user_email",
                       "template": "hpbuysell.adm.usermgmt.ui.ext.fragment.FilterbarFieldForProjects",
                       "required": false,

@@ -49,7 +49,7 @@ sap.ui.define([
                 oController.getView().setModel(new JSONModel(aProjects), "projects");
             } catch (oError) {
                 // MessageToast.show("Unable to load or find projects related to selected partner");
-                MessageToast.show(oError);
+                MessageToast.show("No Projects found for the selected Partner");
                 return;
             }
             if (!this._oManageProjectsDialog) {

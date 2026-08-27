@@ -226,6 +226,21 @@ annotate service.Users with @(
         $edmJson: {
             $Not: { $Path: '/auth/canDelete' }
         }
+    },
+    Capabilities: {
+        NavigationRestrictions : {
+            $Type : 'Capabilities.NavigationRestrictionsType',
+            RestrictedProperties : [
+                {
+                    $Type : 'Capabilities.NavigationPropertyRestriction',
+                    NavigationProperty : DraftAdministrativeData,
+                    FilterRestrictions : {
+                        $Type : 'Capabilities.FilterRestrictionsType',
+                        Filterable : false,
+                    },
+                },
+            ],
+        },
     }
 );
 
@@ -322,3 +337,19 @@ annotate service.BusinessPartnerVH with {
     partnerId @title: 'Partner ID';
     partnerName @title: 'Partner Name';
 };
+annotate service.Users with {
+    firstName @Common.Label : '{i18n>First Name}'
+};
+
+annotate service.Users with {
+    lastName @Common.Label : '{i18n>Last Name}'
+};
+
+annotate service.UserGroups with {
+    groupName @Common.Label : 'Group Name'
+};
+
+annotate service.Users with {
+    active @Common.Label : 'Active'
+};
+
