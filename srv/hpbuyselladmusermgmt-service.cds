@@ -9,10 +9,8 @@ using {
 @changelog.Ui.ChangeHistoryView 
 service UserManagementService 
 @(path: '/user-management')
-// @(require: 'authenticated-user')
 {
     @odata.singleton  @cds.persistence.skip
- 
     entity auth {
 
         key ID        : String;
@@ -60,6 +58,15 @@ service UserManagementService
         action deactivateUserMain();
     };
 
+    @Common.SideEffects #PartnerChange: {
+        SourceProperties: [
+            partnerId,
+            partnerType
+        ],
+        TargetEntities: [
+            projects
+        ]
+    }
     entity PartnerAssignments as projection on db.PartnerAssignments;
  
     entity ProjectAssignments as projection on db.ProjectAssignments;
@@ -108,9 +115,12 @@ service UserManagementService
                         null as String(241)
                     )            as userEmail
             };
-            // order by partnerId;
 
     entity UserGroups as projection on db.UserGroups;
+    // entity GroupNameVH as select distinct from UserGroups {
+    //     key groupName
+    // };
+
     function searchUsers(searchTerm: String)                                                       returns array of Users;
     function findSelectedProjects(partnerID: UUID, isActiveEntity: Boolean)                        returns array of ProjectUAMVH;
     action   exportUsers(emails: array of String)                                                  returns {

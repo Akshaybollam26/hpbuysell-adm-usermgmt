@@ -1,3 +1,6 @@
+using from '../../srv/hpbuyselladmusermgmt-service';
+using from '../../srv/hpbuyselladmusermgmt-annotations';
+using from '../../db/hpbuyselladmusermgmt-model';
 // using UserManagementService as service from '../../srv/hpbuyselladmusermgmt-service';
 
 // annotate service.Users with @(
@@ -345,4 +348,31 @@
 // annotate service.Users with {
 //     active @Common.Label : 'Active'
 // };
+
+annotate UserManagementService.PartnerAssignments with @(
+    UI.LineItem #Customers : [
+        {
+            $Type : 'UI.DataField',
+            Value : partnerId,
+            Label : 'Customer ID',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : partnerName,
+            Label : 'Customer Name',
+        },
+    ],
+    UI.LineItem #Suppliers : [
+        {
+            $Type : 'UI.DataField',
+            Value : partnerId,
+            Label : 'Supplier ID',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : partnerName,
+            Label : 'Supplier Name',
+        },
+    ],
+);
 

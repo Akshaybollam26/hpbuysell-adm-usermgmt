@@ -200,12 +200,6 @@ annotate service.Users with @(
             $Not: { $Path: '/auth/canCreate' }
         }
     },
-
-    // UI.UpdateHidden : {
-    //     $edmJson: {
-    //         $Not: { $Path: '/auth/canUpdate' }
-    //     }
-    // },
     UI.UpdateHidden : {
         $edmJson: {
             $Or: [
@@ -283,6 +277,11 @@ annotate service.PartnerAssignments with @(
             Value : partnerId,
             Label : 'Customer ID',
         },
+        {
+            $Type : 'UI.DataField',
+            Value : partnerName,
+            Label : 'Test name',
+        },
     ],
     UI.LineItem #Suppliers: [
         {
@@ -290,46 +289,31 @@ annotate service.PartnerAssignments with @(
             Value : partnerId,
             Label : 'Supplier ID',
         },
+        {
+            $Type : 'UI.DataField',
+            Value : partnerName,
+            Label : 'Test Name',
+        },
     ]
 );
 
-annotate service.PartnerAssignments:partnerId with @(
-    Common.ValueList: {
-        CollectionPath: 'BusinessPartnerVH',
-
-        Parameters: [
-            {
-                $Type: 'Common.ValueListParameterInOut',
-                LocalDataProperty: partnerId,
-                ValueListProperty: 'partnerId'
-            },
-            {
-                $Type: 'Common.ValueListParameterOut',
-                ValueListProperty: 'partnerName',
-                LocalDataProperty: partnerName
-            }
-        ],
-    },
-    Common.ValueListWithFixedValues: false,
-    Common.ValueListForValidation: true
-);
 // annotate service.BusinessPartnerVH with @cds.search: {
 //   partnerId,
 //   partnerName
 // };
-annotate service.BusinessPartnerVH {
-    partnerId @UI.HiddenFilter;
-    customerId @UI.HiddenFilter;
-    partnerName @UI.HiddenFilter;
-    partnerType @UI.HiddenFilter;
-    supplierId @UI.HiddenFilter;
-    userEmail @UI.HiddenFilter;
-};
+// annotate service.BusinessPartnerVH {
+//     partnerId @UI.HiddenFilter;
+//     customerId @UI.HiddenFilter;
+//     partnerName @UI.HiddenFilter;
+//     partnerType @UI.HiddenFilter;
+//     supplierId @UI.HiddenFilter;
+//     userEmail @UI.HiddenFilter;
+// };
 
-annotate service.BusinessPartnerVH with {
-    partnerId @title: 'Partner ID';
-    partnerName @title: 'Partner Name';
-};
+// annotate service.BusinessPartnerVH with {
+//     partnerId @title: 'Partner ID';
+//     partnerName @title: 'Partner Name';
+// };
 annotate service.Users with {
     firstName @Common.Label : '{i18n>First Name}'
 };

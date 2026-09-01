@@ -1,17 +1,17 @@
 <core:FragmentDefinition xmlns:core="sap.ui.core" xmlns="sap.m"  xmlns:vh="sap.ui.comp.valuehelpdialog" xmlns:fb="sap.ui.comp.filterbar">
-    <vh:ValueHelpDialog id="vhdForProjectsFilter" title="Select Projects" supportMultiselect="true" key="wbselement" descriptionKey="wbsdescription" core:require="{handler:'hpbuysell/adm/usermgmt/ui/ext/fragment/SuppMngProjColumn'}"
+    <vh:ValueHelpDialog id="vhdForProjectsFilter" title="Projects" supportMultiselect="true" key="wbselement" descriptionKey="wbsdescription" core:require="{handler:'hpbuysell/adm/usermgmt/ui/ext/fragment/SuppMngProjColumn'}"
         ok="handler.vhdForProjects_onOK" cancel="handler.vhdForProjects_onCancel" afterClose="handler.onVHDForProjects_AfterClose">
         <vh:filterBar>
-            <fb:FilterBar id="VHDFilterBar" showGoOnFB="true" useToolbar="true" search="handler.onVHDForProjectFilter_Search">
+            <fb:FilterBar id="VHDFilterBar" showGoOnFB="true" useToolbar="true" advancedMode="true" isRunningInValueHelpDialog="true" search="handler.onVHDForProjectFilter_Search">
                 <fb:filterGroupItems>
                     <fb:FilterGroupItem groupName="__$INTERNAL$" name="projectId" label="Project Id" visibleInFilterBar="true">
                         <fb:control>
-                            <Input id="fb1"/>
+                            <Input id="fb1" showValueHelp="true" core:require="{handler: 'hpbuysell/adm/usermgmt/ui/ext/fragment/SuppMngProjColumn'}" valueHelpRequest="handler.onVHReqForProjsIntPId"/>
                         </fb:control>
                     </fb:FilterGroupItem>
                     <fb:FilterGroupItem groupName="__$INTERNAL$" name="companyCode" label="Company Code" visibleInFilterBar="true">
                         <fb:control>
-                            <Input id="fb2"/>
+                            <Input id="fb2"  showValueHelp="true" core:require="{handler: 'hpbuysell/adm/usermgmt/ui/ext/fragment/SuppMngProjColumn'}" valueHelpRequest="handler.onVHReqForProjsIntCompCode"/>
                         </fb:control>
                     </fb:FilterGroupItem>
                 </fb:filterGroupItems>

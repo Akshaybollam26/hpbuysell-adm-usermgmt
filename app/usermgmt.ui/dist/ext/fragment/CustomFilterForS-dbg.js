@@ -7,17 +7,44 @@ sap.ui.define([
         onValueHelpRequest: function (oEvent) {
             Handler._oMultiInput = oEvent.getSource();
             const oModel = this._controller.getView().getModel("commonServiceModel"),
-                sTitle = "Select Suppliers",
-                sPath = "commonServiceModel>/SupplierVH",
+                sTitle = "Suppliers",
+                sPath = "commonServiceModel>/Supplier",
                 sKey = "commonServiceModel>supplierid",
                 sText = "commonServiceModel>suppliername";
+            var oBasicSearchField = new sap.m.SearchField({
+                placeholder: "Search...",
+                showSearchButton: true,
+            });
             sap.ui.require(["sap/ui/comp/valuehelpdialog/ValueHelpDialog"], function (ValueHelpDialog) {
                 const oDialog = new ValueHelpDialog({
                     title: sTitle,
                     supportMultiselect: true,
-                    supportRanges: false,
+                    // supportRanges: true,
                     key: "supplierid",
                     descriptionKey: "suppliername",
+                    filterBar: new sap.ui.comp.filterbar.FilterBar({
+                        advancedMode: false,
+                        showGoOnFB: true,
+                        showFilterConfiguration: false,
+                        useToolbar: false,
+                        search: function (oEvent) {
+                            const sSearchValue = oEvent.getParameter("value") || oBasicSearchField.getValue();
+                            const oTable = oDialog.getTable();
+                            const oBinding = oTable.getBinding("rows") || oTable.getBinding("items");
+                            if (!oBinding) return;
+
+                            const aFilters = sSearchValue
+                                ? new Filter({
+                                    filters: [
+                                        new Filter("supplierid", FilterOperator.Contains, sSearchValue),
+                                        new Filter("suppliername", FilterOperator.Contains, sSearchValue)
+                                    ],
+                                    and: false
+                                })
+                                : [];
+                            oBinding.filter(aFilters);
+                        },
+                    }),
                     ok: function (oEvent) {
                         const aTokens = oEvent.getParameter("tokens") || [];
                         Handler._oMultiInput.setTokens(aTokens);
@@ -28,8 +55,19 @@ sap.ui.define([
                     cancel: function () { oDialog.close(); },
                     afterClose: function () { oDialog.destroy(); }
                 });
+                // oDialog.setRangeKeyFields([
+                //     {
+                //         label: "Supplier Id",
+                //         key: "supplierid",
+                //         type: "string"
+                //     }
+                // ]);
+                oDialog.getFilterBar().setBasicSearch(oBasicSearchField);
+                oBasicSearchField.attachSearch(function() {
+					oDialog.getFilterBar().search();
+				});
                 oDialog.setTokens(Handler._oMultiInput.getTokens().map(function (oToken) {
-                    return new Token({ key: oToken.getKey() });
+                    return new Token({ key: oToken.getKey(), text: oToken.getText() });
                 }));
                 oDialog.setModel(oModel, "commonServiceModel");
                 oDialog.getTableAsync().then(function (oTable) {
@@ -68,12 +106,41 @@ sap.ui.define([
                 oDialog.open();
             });
         },
+        onSuggItemSelForS: function(oEvent){
+            //get values of sel rows and create tokens, 
+            // set tokens
+            //set value
+            const oControl = oEvent.getSource();
+            const oSelectedItem = oEvent.getParameter("selectedRow"); // ColumnListItem
+            if (!oSelectedItem) return;
+
+            const oCtx = oSelectedItem.getBindingContext("commonServiceModel");
+            if (!oCtx) return;
+
+            const sSupplierId = oCtx.getProperty("supplierid");
+            const sSupplierName = oCtx.getProperty("suppliername");
+
+            var bAlreadyExists = Handler._oMultiInput.getTokens().some(function (oExistingToken) {
+                return oExistingToken.getKey() === sSupplierId;
+            });
+            if (!bAlreadyExists) {
+                Handler._oMultiInput.addToken(
+                    new sap.m.Token({
+                        key: sSupplierId,
+                        text: sSupplierName + " (" + sSupplierId + ")"
+                    })
+                );
+            }
+            setTimeout(function () {
+                Handler._updateFilterValue(Handler._oMultiInput.getTokens());
+            }, 0);
+        },
         onLiveChangeOfS: function(oEvent){
             if(!Handler._oMultiInput)
                 Handler._oMultiInput = oEvent.getSource();
         },
         onTokenUpdate: function (oEvent) {
-            setTimeout(function () { Handler._updateFilterValue(oEvent.getSource().getTokens()); }, 0);
+            // setTimeout(function () { Handler._updateFilterValue(oEvent.getSource().getTokens()); }, 0);
         },
         _updateFilterValue: function (aTokens) {
             Handler._oMultiInput.setValue(aTokens.map(function (oToken) { return oToken.getKey(); }).join(","));
@@ -91,7 +158,7 @@ sap.ui.define([
         },
         _buildFilter: function(sValue, sPath){
             if (!sValue) return null;
-            const aIds = sValue.split(",").map(function (s) { return s.trim(); }).filter(Boolean);
+            const aIds = sValue.toUpperCase().split(",").map(function (s) { return s.trim(); }).filter(Boolean);
             if (!aIds.length) return null;
             return new Filter({
                 filters: aIds.map(function (sId) {

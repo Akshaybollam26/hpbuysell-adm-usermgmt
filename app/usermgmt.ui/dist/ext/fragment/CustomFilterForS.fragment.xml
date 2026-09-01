@@ -5,13 +5,39 @@
         showValueHelp="true"
         core:require="{handler:'hpbuysell/adm/usermgmt/ui/ext/fragment/CustomFilterForS'}"
         valueHelpRequest="handler.onValueHelpRequest"
-        tokenUpdate="handler.onTokenUpdate"
         liveChange="handler.onLiveChangeOfS"
+        showSuggestion="true"
+        suggestionRows="{commonServiceModel>/Supplier}"
+		suggestionItemSelected="handler.onSuggItemSelForS"
         value="{
             path: 'filterValues>',
             type: 'sap.fe.macros.filter.type.Value',
             formatOptions: {
                 operator: 'hpbuysell.adm.usermgmt.ui.ext.fragment.CustomFilterForS.filterItems'
             }
-        }"/>
+        }">
+        <suggestionColumns>
+			<Column
+				hAlign="Begin"
+				popinDisplay="Inline"
+				demandPopin="true">
+				<Label text="Supplier Id"/>
+			</Column>
+			<Column
+				hAlign="Center"
+				popinDisplay="Inline"
+				demandPopin="true"
+				minScreenWidth="Tablet">
+				<Label text="Supplier Name"/>
+			</Column>
+		</suggestionColumns>
+		<suggestionRows>
+			<ColumnListItem>
+			<cells>
+				<Label text="{commonServiceModel>supplierid}"/>
+				<Label text="{commonServiceModel>suppliername}"/>
+			</cells>
+			</ColumnListItem>
+		</suggestionRows>
+    </MultiInput>
 </core:FragmentDefinition>

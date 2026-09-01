@@ -37,7 +37,7 @@ sap.ui.define([
                 }
 
                 var aTokens = oMultiInput.getTokens();
-                var sTypedValue = oMultiInput.getValue().trim();
+                var sTypedValue = oMultiInput.getValue().trim().toUpperCase();
  
                 if (!aTokens.length && !sTypedValue) {
                     return;
@@ -101,9 +101,6 @@ sap.ui.define([
             _handleCustomExcelExport: function (oEvent) {
                 // Prevent standard export
                 oEvent.preventDefault();
-
-                debugger;
-
                 var oView = this.base.getView();
                 var oModel = this.base.getExtensionAPI().getModel();
 
@@ -192,9 +189,6 @@ sap.ui.define([
                         oTable.attachBeforeExport(
                             this._handleCustomExcelExport.bind(this)
                         );
-
-                        console.log("Successfully attached backend export handler.");
-
                     } else {
 
                         setTimeout(function () {
@@ -208,8 +202,6 @@ sap.ui.define([
                                 oDelayedTable.attachBeforeExport(
                                     this._handleCustomExcelExport.bind(this)
                                 );
-
-                                console.log("Successfully attached delayed export handler.");
                             }
 
                         }.bind(this), 500);

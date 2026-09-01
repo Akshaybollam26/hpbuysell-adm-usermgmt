@@ -5,10 +5,10 @@
         showValueHelp="true"
         core:require="{handler: 'hpbuysell/adm/usermgmt/ui/ext/fragment/CustomFilterForC'}"
         valueHelpRequest="handler.onValueHelpRequest"
-        tokenUpdate="handler.onTokenUpdate"
         liveChange="handler.onLiveChangeOfC"
         showSuggestion="true"
-        suggestionRows="{commonServiceModel>/CustomerVH}"
+        suggestionRows="{commonServiceModel>/Customer}"
+		suggestionItemSelected="handler.onSuggItemSelForC"
         value="{
             path: 'filterValues>',
             type: 'sap.fe.macros.filter.type.Value',

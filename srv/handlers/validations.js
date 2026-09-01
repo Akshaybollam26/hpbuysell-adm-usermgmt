@@ -78,7 +78,10 @@ module.exports = (srv) => {
 
     //validate that each partner profile have some project managed
     srv.before("SAVE", Users.drafts, async (req) => {
-        const sUserEmail = req.data.email;
+        const mdm = await cds.connect.to('MdmCommonService');
+        const sUserEmail = req.data.email || req.params?.[0]?.email;
+        if (!sUserEmail) return;
+        
         // Get all partner assignments currently present in the User draft
         const userRecord = await SELECT.one.from(Users).where({ email: sUserEmail });
         //validate if editor is from finance group - Y? let them save without validation
@@ -95,17 +98,17 @@ module.exports = (srv) => {
                 user_email: sUserEmail
             });
         //get projects of each partner - stop wherever validation fails(atleast one proj is mandatory before saving)
-        for (const oPartner of aPartners) {
+        for (const row of aPartners) {
             const aProjects = await SELECT
                 .from(ProjectAssignments.drafts)
                 .columns("ID")
                 .where({
-                    partner_ID: oPartner.ID
+                    partner_ID: row.ID
                 });
             if (aProjects.length === 0) {
                 req.error(
                     400,
-                    `Please assign at least one project to partner profile ${oPartner.partnerId}.`
+                    `Please assign at least one project to partner profile ${row.partnerId}.`
                 );
             }
         }
@@ -118,6 +121,7 @@ module.exports = (srv) => {
      */
 
     srv.before(['CREATE', 'UPDATE'], PartnerAssignments, async (req) => {
+        const mdm = await cds.connect.to('MdmCommonService');
         const { partnerType, partnerId } = req.data;
 
         /*
@@ -140,18 +144,15 @@ module.exports = (srv) => {
         let existingAssignment = null;
 
         if (req.event === 'UPDATE') {
-
             existingAssignment = await SELECT.one
                 .from(PartnerAssignments)
                 .where({ ID });
-
             if (!existingAssignment) {
                 return req.reject(
                     404,
                     'Partner assignment not found'
                 );
             }
-
             /*
              * Once a Customer/Supplier assignment is created, its
              * identity fields must never change. Only the nested
@@ -160,7 +161,7 @@ module.exports = (srv) => {
              * validation below and is unaffected by this check.
              */
             if ('partnerType' in req.data && req.data.partnerType !== existingAssignment.partnerType) {
-                return req.reject( 400, 'Partner Type cannot be changed once created' );
+                return req.reject(400, 'Partner Type cannot be changed once created');
             }
 
             if ('partnerId' in req.data && req.data.partnerId && req.data.partnerId !== existingAssignment.partnerId) {
@@ -168,27 +169,22 @@ module.exports = (srv) => {
                 return req.reject(400, 'Partner ID cannot be changed once created');
             }
         }
-
         const finalPartnerType = partnerType || existingAssignment?.partnerType;
-
         const finalPartnerId = partnerId || existingAssignment?.partnerId;
-
         /*
          * Validate Customer/Supplier against active master data.
          * Also auto-populate partnerName from master data.
          */
         if (finalPartnerType === 'C' && finalPartnerId) {
-            const customer = await SELECT.one.from(CustomerVH).where({ customerId: finalPartnerId });
-
+            const customer = await mdm.run(SELECT.one.from(Customer).where({ customerId: finalPartnerId }));
             if (!customer) {
                 return req.reject(400, `Customer ID '${finalPartnerId}' does not exist in the master data or is inactive`);
             }
-
             req.data.partnerName = customer.customerName;
         }
 
         if (finalPartnerType === 'S' && finalPartnerId) {
-            const supplier = await SELECT.one.from(SupplierVH).where({supplierId: finalPartnerId});
+            const supplier = await mdm.run(SELECT.one.from(Supplier).where({ supplierId: finalPartnerId }));
             if (!supplier) {
                 return req.reject(400, `Supplier ID '${finalPartnerId}' does not exist in the master data or is inactive`);
             }
@@ -207,22 +203,74 @@ module.exports = (srv) => {
             }
         }
     });
+    // srv.on('CREATE', PartnerAssignments.drafts, async (req) => {
+    //     console.log("came here in PA draft handler");
+    //     const mdm = await cds.connect.to('MdmCommonService');
+    //     const { partnerType, partnerId } = req.data;
 
+    //     if (!partnerType || !partnerId) return;
+
+    //     if (partnerType === 'C') {
+    //         const customer = await mdm.run(
+    //             SELECT.one.from('Customer')
+    //                 .columns('customername')
+    //                 .where({ customerid: partnerId })
+    //         );
+
+    //         if (!customer) {
+    //             return req.reject(400, `Customer ID '${partnerId}' does not exist in the master data or is inactive`);
+    //         }
+
+    //         req.data.partnerName = customer.customername;
+    //     }
+
+    //     else if (partnerType === 'S') {
+    //         const supplier = await mdm.run(
+    //             SELECT.one.from('Supplier')
+    //                 .columns('suppliername')
+    //                 .where({ supplierid: partnerId })
+    //         );
+
+    //         if (!supplier) {
+    //             return req.reject(400, `Supplier ID '${partnerId}' does not exist in the master data or is inactive`);
+    //         }
+
+    //         req.data.partnerName = supplier.suppliername;
+    //     }
+    // });
     srv.before('UPDATE', PartnerAssignments.drafts, async (req) => {
-
+        const mdm = await cds.connect.to('MdmCommonService');
         const ID = req.data.ID || req.params?.[0]?.ID;
-
+        console.log("came here")
         if (!ID) return req.reject(400, 'Partner assignment ID is missing');
 
         const existingAssignment = await SELECT.one.from(PartnerAssignments.drafts).where({ ID });
         if (!existingAssignment) return req.reject(404, 'Partner assignment not found');
 
-        const partnerIdChanged ='partnerId' in req.data && req.data.partnerId && req.data.partnerId !== existingAssignment.partnerId;
-
+        const partnerIdChanged = 'partnerId' in req.data && req.data.partnerId && req.data.partnerId !== existingAssignment.partnerId;
         const partnerTypeChanged = 'partnerType' in req.data && req.data.partnerType && req.data.partnerType !== existingAssignment.partnerType;
 
         if (partnerIdChanged || partnerTypeChanged) {
-            await DELETE.from(ProjectAssignments.drafts).where({ partner_ID: ID});
+            await DELETE.from(ProjectAssignments.drafts).where({ partner_ID: ID });
+        }
+
+        //1 sep 2026 - 
+        const finalPartnerId = req.data.partnerId;
+        const finalPartnerType = req.data.partnerType;
+        if (finalPartnerType === 'C') {
+            const customer = await mdm.run(
+                SELECT.one.from('Customer').columns('customername').where({ customerid: finalPartnerId })
+            );
+            // if (!customer) return req.reject(400, `Customer ID '${finalPartnerId}' does not exist in the master data or is inactive`);
+            if(customer) req.data.partnerName = customer.customername;
+        }
+
+        if (finalPartnerType === 'S') {
+            const supplier = await mdm.run(
+                SELECT.one.from('Supplier').columns('suppliername').where({ supplierid: finalPartnerId })
+            );
+            // if (!supplier) return req.reject(400, `Supplier ID '${finalPartnerId}' does not exist in the master data or is inactive`);
+            if(supplier) req.data.partnerName = supplier.suppliername;
         }
     });
 

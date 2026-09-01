@@ -209,18 +209,10 @@
                     "ProjectsColumn": {
                       "header": "Projects",
                       "position": {
-                        "anchor": "CustNameColumn",
+                        "anchor": "DataField::partnerName",
                         "placement": "After"
                       },
                       "template": "hpbuysell.adm.usermgmt.ui.ext.fragment.ProjectsColumn"
-                    },
-                    "CustNameColumn": {
-                      "header": "Customer Name",
-                      "position": {
-                        "anchor": "DataField::partnerId",
-                        "placement": "After"
-                      },
-                      "template": "hpbuysell.adm.usermgmt.ui.ext.fragment.CustNameColumn"
                     }
                   }
                 },
@@ -237,18 +229,10 @@
                     "SuppProjectsColumn": {
                       "header": "Projects",
                       "position": {
-                        "anchor": "CustNameColumn",
+                        "anchor": "DataField::partnerName",
                         "placement": "After"
                       },
                       "template": "hpbuysell.adm.usermgmt.ui.ext.fragment.SuppProjectsColumn"
-                    },
-                    "CustNameColumn": {
-                      "header": "Supplier Name",
-                      "position": {
-                        "anchor": "DataField::partnerId",
-                        "placement": "After"
-                      },
-                      "template": "hpbuysell.adm.usermgmt.ui.ext.fragment.CustNameColumn"
                     }
                   }
                 }

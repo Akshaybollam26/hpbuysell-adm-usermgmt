@@ -86,6 +86,8 @@ entity PartnerAssignments : cuid, FlexFields {
 
     partnerName : String(100)
     @title              : '{i18n>PartnerName}'
+    @Common.FieldControl: #ReadOnly
+    // @Core.Computed: false
     @Common.FieldControl: {$edmJson: {$If: [
         {$Path: 'HasActiveEntity'},
         {$EnumMember: 'com.sap.vocabularies.Common.v1.FieldControlType/ReadOnly'},

@@ -42,6 +42,7 @@
 					"semanticObject": "usermanagement",
 					"action": "managed",
 					"title": "{{usermanagement-managed.flpTitle}}",
+					"icon": "sap-icon://shipping-status",
 					"signature": {
 						"parameters": {},
 						"additionalParameters": "allowed"
@@ -54,7 +55,7 @@
 		"technology": "UI5",
 		"icons": {
 			"icon": "",
-			"favIcon": "sap-icon://account",
+			"favIcon": "",
 			"phone": "",
 			"phone@2": "",
 			"tablet": "",
@@ -143,7 +144,7 @@
 					"options": {
 						"settings": {
 							"contextPath": "/Users",
-							"variantManagement": "Page",
+							"variantManagement": "Control",
 							"navigation": {
 								"Users": {
 									"detail": {
@@ -184,7 +185,7 @@
 											}
 										},
 										"filterbarFieldForProjects": {
-											"label": "Project Id",
+											"label": "{i18n>Project ID}",
 											"property": "customers/user_email",
 											"template": "hpbuysell.adm.usermgmt.ui.ext.fragment.FilterbarFieldForProjects",
 											"required": false,
@@ -221,18 +222,10 @@
 										"ProjectsColumn": {
 											"header": "Projects",
 											"position": {
-												"anchor": "CustNameColumn",
+												"anchor": "DataField::partnerName",
 												"placement": "After"
 											},
 											"template": "hpbuysell.adm.usermgmt.ui.ext.fragment.ProjectsColumn"
-										},
-										"CustNameColumn": {
-											"header": "Customer Name",
-											"position": {
-												"anchor": "DataField::partnerId",
-												"placement": "After"
-											},
-											"template": "hpbuysell.adm.usermgmt.ui.ext.fragment.CustNameColumn"
 										}
 									}
 								},
@@ -249,18 +242,10 @@
 										"SuppProjectsColumn": {
 											"header": "Projects",
 											"position": {
-												"anchor": "CustNameColumn",
+												"anchor": "DataField::partnerName",
 												"placement": "After"
 											},
 											"template": "hpbuysell.adm.usermgmt.ui.ext.fragment.SuppProjectsColumn"
-										},
-										"CustNameColumn": {
-											"header": "Supplier Name",
-											"position": {
-												"anchor": "DataField::partnerId",
-												"placement": "After"
-											},
-											"template": "hpbuysell.adm.usermgmt.ui.ext.fragment.CustNameColumn"
 										}
 									}
 								}
@@ -275,6 +260,9 @@
 				"sap.ui.controllerExtensions": {
 					"sap.fe.templates.ListReport.ListReportController": {
 						"controllerName": "hpbuysell.adm.usermgmt.ui.ext.controller.ExtForListReportPage"
+					},
+					"sap.fe.templates.ObjectPage.ObjectPageController": {
+						"controllerName": "hpbuysell.adm.usermgmt.ui.ext.controller.ExtForObjReportPage"
 					}
 				}
 			}

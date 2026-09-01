@@ -3,7 +3,6 @@ const { executeHttpRequest } = require('@sap-cloud-sdk/http-client');
 const { SELECT, UPDATE } = require('@sap/cds/lib/ql/cds-ql');
 
 let mdm;
-
 async function getMdm() {
     if (!mdm) {
         mdm = await cds.connect.to('MdmCommonService');
@@ -11,14 +10,123 @@ async function getMdm() {
     return mdm;
 }
 
-module.exports = (srv) => {
+module.exports = async (srv) => {
+    getMdm();
     srv.on('READ', 'CustomerVH', async req => {
         return mdm.run(req.query);
     });
+    // srv.on('READ', 'CustomerVH', async (req) => {
+    //     const whereArr = req.query.SELECT.where;
+
+    //     function extractEqValue(fieldName) {
+    //         if (!Array.isArray(whereArr)) return undefined;
+    //         for (let i = 0; i < whereArr.length; i++) {
+    //             if (whereArr[i]?.ref?.[0] === fieldName && whereArr[i + 1] === '=' && whereArr[i + 2]?.val !== undefined) {
+    //                 return whereArr[i + 2].val;
+    //             }
+    //         }
+    //         return undefined;
+    //     }
+    //     function stripCondition(fieldName) {
+    //         if (!Array.isArray(whereArr)) return;
+    //         for (let i = 0; i < whereArr.length; i++) {
+    //             if (whereArr[i]?.ref?.[0] === fieldName && whereArr[i + 1] === '=') {
+    //                 const clauseStart = i > 0 && (whereArr[i - 1] === 'and' || whereArr[i - 1] === 'or') ? i - 1 : i;
+    //                 const clauseEnd = (whereArr[i + 3] === 'and' || whereArr[i + 3] === 'or') ? i + 3 : i + 2;
+    //                 whereArr.splice(clauseStart, clauseEnd - clauseStart + 1);
+    //                 return;
+    //             }
+    //         }
+    //     }
+    //     const rowID = extractEqValue('rowID');
+    //     if (rowID) stripCondition('rowID');
+
+    //     // existing behavior — proxy the (now-cleaned) query to MDM
+    //     const results = await mdm.run(req.query);
+
+    //     if (!rowID || !results?.length) return results;
+
+    //     const [draftRow, activeRow] = await Promise.all([
+    //         SELECT.one.from(PartnerAssignments.drafts).where({ ID: rowID }),
+    //         SELECT.one.from(PartnerAssignments).where({ ID: rowID })
+    //     ]);
+    //     const ownerRow = draftRow || activeRow;
+    //     if (!ownerRow?.user_email) return results;
+
+    //     const userEmail = ownerRow.user_email;
+
+    //     const [draftAssignments, activeAssignments] = await Promise.all([
+    //         SELECT.from(PartnerAssignments.drafts).columns('partnerId').where({ user_email: userEmail, partnerType: 'C' }),
+    //         SELECT.from(PartnerAssignments).columns('partnerId').where({ user_email: userEmail, partnerType: 'C' })
+    //     ]);
+
+    //     const assignedIDs = new Set([
+    //         ...draftAssignments.map(r => r.partnerId).filter(Boolean),
+    //         ...activeAssignments.map(r => r.partnerId).filter(Boolean)
+    //     ]);
+    //     assignedIDs.delete(ownerRow.partnerId);
+
+    //     return results.filter(row => !assignedIDs.has(row.customerid));
+    // });
 
     srv.on('READ', 'SupplierVH', async req => {
         return mdm.run(req.query);
     });
+    // srv.on('READ', 'SupplierVH', async req => {
+    //     const whereArr = req.query.SELECT.where;
+
+    //     function extractEqValue(fieldName) {
+    //         if (!Array.isArray(whereArr)) return undefined;
+    //         for (let i = 0; i < whereArr.length; i++) {
+    //             if (whereArr[i]?.ref?.[0] === fieldName && whereArr[i + 1] === '=' && whereArr[i + 2]?.val !== undefined) {
+    //                 return whereArr[i + 2].val;
+    //             }
+    //         }
+    //         return undefined;
+    //     }
+
+    //     function stripCondition(fieldName) {
+    //         if (!Array.isArray(whereArr)) return;
+    //         for (let i = 0; i < whereArr.length; i++) {
+    //             if (whereArr[i]?.ref?.[0] === fieldName && whereArr[i + 1] === '=') {
+    //                 const clauseStart = i > 0 && (whereArr[i - 1] === 'and' || whereArr[i - 1] === 'or') ? i - 1 : i;
+    //                 const clauseEnd = (whereArr[i + 3] === 'and' || whereArr[i + 3] === 'or') ? i + 3 : i + 2;
+    //                 whereArr.splice(clauseStart, clauseEnd - clauseStart + 1);
+    //                 return;
+    //             }
+    //         }
+    //     }
+
+    //     const rowID = extractEqValue('rowID');
+    //     if (rowID) stripCondition('rowID');
+
+    //     // existing behavior — proxy the (now-cleaned) query to MDM
+    //     const results = await mdm.run(req.query);
+
+    //     if (!rowID || !results?.length) return results;
+
+    //     const [draftRow, activeRow] = await Promise.all([
+    //         SELECT.one.from(PartnerAssignments.drafts).where({ ID: rowID }),
+    //         SELECT.one.from(PartnerAssignments).where({ ID: rowID })
+    //     ]);
+    //     const ownerRow = draftRow || activeRow;
+    //     if (!ownerRow?.user_email) return results;
+
+    //     const userEmail = ownerRow.user_email;
+
+    //     const [draftAssignments, activeAssignments] = await Promise.all([
+    //         SELECT.from(PartnerAssignments.drafts).columns('partnerId').where({ user_email: userEmail, partnerType: 'C' }),
+    //         SELECT.from(PartnerAssignments).columns('partnerId').where({ user_email: userEmail, partnerType: 'C' })
+    //     ]);
+
+    //     const assignedIDs = new Set([
+    //         ...draftAssignments.map(r => r.partnerId).filter(Boolean),
+    //         ...activeAssignments.map(r => r.partnerId).filter(Boolean)
+    //     ]);
+    //     assignedIDs.delete(ownerRow.partnerId);
+
+    //     return results.filter(row => !assignedIDs.has(row.supplierid));
+    // });
 
     srv.on('READ', 'ProjectUAMVH', async req => {
         return mdm.run(req.query);

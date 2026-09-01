@@ -37,7 +37,7 @@ sap.ui.define([
                 }
 
                 var aTokens = oMultiInput.getTokens();
-                var sTypedValue = oMultiInput.getValue().trim();
+                var sTypedValue = oMultiInput.getValue().trim().toUpperCase();
  
                 if (!aTokens.length && !sTypedValue) {
                     return;
