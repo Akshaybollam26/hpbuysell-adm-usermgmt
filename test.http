@@ -1,7 +1,8 @@
 ### 
 
 POST http://localhost:4004/user-management/syncusers
-
+Authorization: Basic manage:
+Content-Type: application/json
 
 ###
 

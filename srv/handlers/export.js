@@ -1,9 +1,7 @@
 const cds = require('@sap/cds');
 const ExcelJS = require('exceljs');
-
 module.exports = (srv) => {
     const { Users } = srv.entities;
-
     function fmtDate(d) {
         return d ? new Date(d) : null;
     }
@@ -40,11 +38,9 @@ module.exports = (srv) => {
             { header: 'Last Name', key: 'lastName', width: 16 },
             { header: 'Email Address', key: 'emailAddress', width: 24 },
             { header: 'User Acount Created Date', key: 'createdDate', width: 20 },
-            { header: 'Application', key: 'application', width: 16 },
             { header: 'Role Name', key: 'roleName', width: 40 },
             { header: 'Company Code', key: 'companyCode', width: 14 },
-            { header: 'Partner Code', key: 'partnerCode1', width: 14 },
-            { header: 'Partner Code', key: 'partnerCode2', width: 14 },
+            { header: 'Partner Code', key: 'partnerCode', width: 14 },
             { header: 'Partner Code Name', key: 'partnerCodeName', width: 28 },
             { header: 'WBS-Project Code', key: 'wbsProjectCode', width: 16 },
             { header: 'User Account Status', key: 'accountStatus', width: 16 },
@@ -55,39 +51,40 @@ module.exports = (srv) => {
             { header: 'Buyer Employee ID', key: 'buyerEmployeeId', width: 16 },
             { header: 'Reporting source', key: 'reportingSource', width: 18 }
         ];
+
+
         sheet.getRow(1).font = { bold: true };
 
+
         for (const user of users) {
-            const partners = [...(user.customers || []), ...(user.suppliers || [])];
-            const groupNames = (user.groups || []).map(g => g.groupName).join(' / ');
-            const accountStatus = user.active === false ? 'INACTIVE' : 'ACTIVE';
+            const partners = [
+                ...(user.customers || []),
+                ...(user.suppliers || [])
+            ];
 
-            function addRow(partner, project) {
-                const partnerTypeLabel = partner
-                    ? (partner.partnerType === 'C' ? 'Customer' : 'Supplier')
-                    : '';
 
-                // Best-effort Role Name format based on the sample:
-                // "Supplier: 0100026887 - S4HANA-SG-ywlow@volcano.com.my"
-                // The middle segment (system/landscape code) has no
-                // source field in the current schema - substituted with
-                // the user's actual group name(s) instead. Confirm/
-                // correct this format.
-                const roleName = partner
-                    ? `${partnerTypeLabel}: ${partner.partnerId} - ${groupNames || 'N/A'}-${user.email}`
-                    : (groupNames || '');
+            const groups = user.groups || [];
 
+
+            const accountStatus =
+                user.active === false ? 'INACTIVE' : 'ACTIVE';
+
+
+            function addRow(partner, project, group) {
                 sheet.addRow({
                     userAccountId: user.email,
                     firstName: user.firstName,
                     lastName: user.lastName,
                     emailAddress: user.email,
                     createdDate: fmtDate(user.createdAt),
-                    application: '',
-                    roleName,
+
+
+                    // Role Name is now the individual group name
+                    roleName: group ? group.groupName : '',
+
+
                     companyCode: '',
-                    partnerCode1: partner ? partner.partnerId : '',
-                    partnerCode2: partner ? partner.partnerId : '',
+                    partnerCode: partner ? partner.partnerId : '',
                     partnerCodeName: partner ? partner.partnerName : '',
                     wbsProjectCode: project ? project.projectId : '',
                     accountStatus,
@@ -100,25 +97,48 @@ module.exports = (srv) => {
                 });
             }
 
+
             if (!partners.length) {
-                addRow(null, null);
+                // No partner, but still create rows for each group
+                if (groups.length) {
+                    for (const group of groups) {
+                        addRow(null, null, group);
+                    }
+                } else {
+                    addRow(null, null, null);
+                }
             } else {
                 for (const partner of partners) {
-                    const projects = (partner.projects && partner.projects.length) ? partner.projects : [null];
+                    const projects =
+                        partner.projects && partner.projects.length
+                            ? partner.projects
+                            : [null];
+
+
                     for (const project of projects) {
-                        addRow(partner, project);
+                        // Create one row for every group
+                        if (groups.length) {
+                            for (const group of groups) {
+                                addRow(partner, project, group);
+                            }
+                        } else {
+                            addRow(partner, project, null);
+                        }
                     }
                 }
             }
         }
 
-        // Date columns formatted as dates, not raw ISO strings
+
+        // Date columns formatted as dates
         ['createdDate', 'modifiedDate'].forEach((key) => {
             const col = sheet.getColumn(key);
             col.numFmt = 'yyyy-mm-dd hh:mm:ss';
         });
 
+
         const buffer = await workbook.xlsx.writeBuffer();
+
 
         return {
             fileName: 'UserExport.xlsx',

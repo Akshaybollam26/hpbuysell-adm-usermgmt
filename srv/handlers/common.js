@@ -12,6 +12,13 @@ async function getMdm() {
 
 module.exports = async (srv) => {
     getMdm();
+    const {
+        PartnerAssignments,
+        ProjectAssignments,
+        ProjectMaster,
+        Users,
+        UserGroups
+    } = srv.entities;
     srv.on('READ', 'CustomerVH', async req => {
         return mdm.run(req.query);
     });
@@ -133,9 +140,6 @@ module.exports = async (srv) => {
     });
 
     srv.on('syncusers', async (req) => {
-        if (!req.user || !req.user.is('authenticated-user')) {
-            return req.reject(401, 'Unauthorized request: Invalid or missing token from scheduler.');
-        }
         const headers = req.http?.req?.headers || {};
         try {
             // Use a managed CAP transaction for the database sync
