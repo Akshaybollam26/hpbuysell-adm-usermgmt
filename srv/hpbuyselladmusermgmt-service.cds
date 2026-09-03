@@ -67,15 +67,24 @@ service UserManagementService
             projects
         ]
     }
-    entity PartnerAssignments as projection on db.PartnerAssignments;
+    entity PartnerAssignments as projection on db.PartnerAssignments{
+    *,
+    virtual userEmail : String(241)
+};
  
     entity ProjectAssignments as projection on db.ProjectAssignments;
 
     @readonly
-    entity CustomerVH as projection on MdmCustomerVH;
+    entity CustomerVH as projection on MdmCustomerVH{
+        *,
+        cast(null as String(241)) as userEmail
+    };
 
     @readonly
-    entity SupplierVH as projection on MdmSupplierVH;
+    entity SupplierVH as projection on MdmSupplierVH{
+        *,
+        cast(null as String(241)) as userEmail
+    };
 
     @readonly
     entity ProjectUAMVH as projection on MdmProjectUAMVH;
@@ -84,42 +93,13 @@ service UserManagementService
     @restrict: [{ grant: 'READ', to: ['UsermgmtViewer', 'UsermgmtManage'] }]
     entity ChangeView as projection on cl.ChangeView;
 
- 
-    entity BusinessPartnerVH  as
-            select from CustomerVH {
-                key customerid   as partnerId,
-                    customerid   as customerId,
-                    cast(
-                        null as String(10)
-                    )            as supplierId,
-                    customername as partnerName,
-                    cast(
-                        'C' as String(1)
-                    )            as partnerType,
-                    cast(
-                        null as String(241)
-                    )            as userEmail
-            }
-            union all
-            select from SupplierVH {
-                key supplierid   as partnerId,
-                    cast(
-                        null as String(10)
-                    )            as customerId,
-                    supplierid   as supplierId,
-                    suppliername as partnerName,
-                    cast(
-                        'S' as String(1)
-                    )            as partnerType,
-                    cast(
-                        null as String(241)
-                    )            as userEmail
-            };
-
     entity UserGroups as projection on db.UserGroups;
-    // entity GroupNameVH as select distinct from UserGroups {
-    //     key groupName
-    // };
+
+    @readonly
+    @cds.persistence.skip
+    entity GroupNameVH {
+        key groupName : String(255);
+    }
 
     function searchUsers(searchTerm: String)                                                       returns array of Users;
     function findSelectedProjects(partnerID: UUID, isActiveEntity: Boolean)                        returns array of ProjectUAMVH;

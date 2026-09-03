@@ -113,7 +113,7 @@ annotate service.UserGroups with {
     groupName @(
         Common.ValueList               : {
             $Type         : 'Common.ValueListType',
-            CollectionPath: 'UserGroups',
+            CollectionPath: 'GroupNameVH',
             Parameters    : [{
                 $Type            : 'Common.ValueListParameterInOut',
                 LocalDataProperty: groupName,

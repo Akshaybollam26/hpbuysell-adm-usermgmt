@@ -227,6 +227,9 @@
 											},
 											"template": "hpbuysell.adm.usermgmt.ui.ext.fragment.ProjectsColumn"
 										}
+									},
+									"tableSettings": {
+										"enableExport": false
 									}
 								},
 								"suppliers/@com.sap.vocabularies.UI.v1.LineItem#Suppliers": {
@@ -247,6 +250,14 @@
 											},
 											"template": "hpbuysell.adm.usermgmt.ui.ext.fragment.SuppProjectsColumn"
 										}
+									},
+									"tableSettings": {
+										"enableExport": false
+									}
+								},
+								"groups/@com.sap.vocabularies.UI.v1.LineItem#UserGroups": {
+									"tableSettings": {
+										"enableExport": false
 									}
 								}
 							}
