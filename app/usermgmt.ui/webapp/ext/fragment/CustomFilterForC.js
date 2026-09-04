@@ -1,3 +1,20 @@
+//-----------------------------------------------------------------------------------*
+// Confidential and Proprietary
+// Copyright 2026, HP
+// All Rights Reserved
+//-----------------------------------------------------------------------------------*
+// Application Name :    User Managment Application
+// WRICEF No        :
+// Release          :
+// Author           :    Meer Arfat Ali/Akshay Bollam
+// Created Date     :    02.09.2026
+// Description      :    User Managment Application
+//-----------------------------------------------------------------------------------*
+//Change Log:
+//    Date      |   Author      |   Defect/Incident     |   Change Description
+//-----------------------------------------------------------------------------------*/
+
+
 sap.ui.define([
     "sap/ui/model/Filter", "sap/ui/model/FilterOperator", "sap/m/Token", "sap/m/Text", "sap/m/Column", "sap/m/ColumnListItem", "sap/ui/table/Column"
 ], function (Filter, FilterOperator, Token, Text, Column, ColumnListItem, UITableColumn) {

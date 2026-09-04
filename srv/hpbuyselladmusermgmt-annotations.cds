@@ -1,3 +1,19 @@
+//-----------------------------------------------------------------------------------*
+// Confidential and Proprietary
+// Copyright 2026, HP
+// All Rights Reserved
+//-----------------------------------------------------------------------------------*
+// Application Name :    User Managment Application
+// WRICEF No        :
+// Release          :
+// Author           :    Meer Arfat Ali/Akshay Bollam
+// Date             :    02.09.2026
+// Description      :    User Managment Application
+//-----------------------------------------------------------------------------------*
+//Change Log:
+//    Date      |   Author      |   Defect/Incident     |   Change Description
+//-----------------------------------------------------------------------------------*/
+
 using UserManagementService as service from './hpbuyselladmusermgmt-service';
 
 annotate service.Users with @(

@@ -1,3 +1,23 @@
+<!-- 
+**********
+//Confidential and Proprietary
+//Copyright 2026, HP
+//All Rights Reserved
+****
+// Application Name :    User Management Application
+// WRICEF No        :
+// Release          :
+// Author           :   Meer Arfat Ali/Akshay Bollam
+// Date             :    02.09.2026
+// Description      :    User Management Application
+*****
+//Descriptions: Used for data modelling
+*******
+//Change Log:
+//    Date      |   Author      |   Defect/Incident     |   Change Description
+*******
+  -->
+  
 <core:FragmentDefinition xmlns:core="sap.ui.core" xmlns="sap.m"  xmlns:vh="sap.ui.comp.valuehelpdialog" xmlns:fb="sap.ui.comp.filterbar">
     <vh:ValueHelpDialog id="vhdForProjectsFilter" title="Projects" supportMultiselect="true" key="wbselement" descriptionKey="wbsdescription" core:require="{handler:'hpbuysell/adm/usermgmt/ui/ext/fragment/SuppMngProjColumn'}"
         ok="handler.vhdForProjects_onOK" cancel="handler.vhdForProjects_onCancel" afterClose="handler.onVHDForProjects_AfterClose">

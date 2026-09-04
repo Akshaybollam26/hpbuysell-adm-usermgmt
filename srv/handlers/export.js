@@ -1,3 +1,18 @@
+//-----------------------------------------------------------------------------------*
+// Confidential and Proprietary
+// Copyright 2026, HP
+// All Rights Reserved
+//-----------------------------------------------------------------------------------*
+// Application Name :    User Managment Application
+// WRICEF No        :
+// Release          :
+// Author           :    Meer Arfat Ali/Akshay Bollam
+// Date             :    02.09.2026
+// Description      :    User Managment Application
+//-----------------------------------------------------------------------------------*
+//Change Log:
+//    Date      |   Author      |   Defect/Incident     |   Change Description
+//-----------------------------------------------------------------------------------*/
 const cds = require('@sap/cds');
 const ExcelJS = require('exceljs');
 module.exports = (srv) => {

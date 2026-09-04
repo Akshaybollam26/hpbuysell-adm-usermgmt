@@ -1,3 +1,18 @@
+//-----------------------------------------------------------------------------------*
+// Confidential and Proprietary
+// Copyright 2026, HP
+// All Rights Reserved
+//-----------------------------------------------------------------------------------*
+// Application Name :    User Managment Application
+// WRICEF No        :
+// Release          :
+// Author           :    Meer Arfat Ali/Akshay Bollam
+// Date             :    02.09.2026
+// Description      :    User Managment Application
+//-----------------------------------------------------------------------------------*
+//Change Log:
+//    Date      |   Author      |   Defect/Incident     |   Change Description
+//-----------------------------------------------------------------------------------*/
 const https = require('https');
 const { SUCCESS_STATUS_CODE, RESULT_STATUS_CODE, ACCEPT_STATUS_CODE } = require('./constants');
 

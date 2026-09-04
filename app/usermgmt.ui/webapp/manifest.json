@@ -37,7 +37,7 @@
           "semanticObject": "usermanagement",
           "action": "managed",
           "title": "{{usermanagement-managed.flpTitle}}",
-          "icon": "sap-icon://shipping-status",
+          "icon": "sap-icon://account",
           "signature": {
             "parameters": {},
             "additionalParameters": "allowed"
